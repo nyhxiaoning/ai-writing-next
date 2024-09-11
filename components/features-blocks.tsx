@@ -3,6 +3,33 @@ import FeaturesBg1 from "@/public/images/features-bg春.jpeg";
 import Image from "next/image";
 import Link from "next/link";
 
+const solarTerms = [
+  "立春",
+  "雨水",
+  "惊蛰",
+  "春分",
+  "清明",
+  "谷雨",
+  "立夏",
+  "小满",
+  "芒种",
+  "夏至",
+  "小暑",
+  "大暑",
+  "立秋",
+  "处暑",
+  "白露",
+  "秋分",
+  "寒露",
+  "霜降",
+  "立冬",
+  "小雪",
+  "大雪",
+  "冬至",
+  "小寒",
+  "大寒",
+];
+
 export default function FeaturesBlocks() {
   return (
     <section className="relative">
@@ -25,7 +52,7 @@ export default function FeaturesBlocks() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
             {/* 1st row */}
             {Array.from({ length: 24 }, (_, i) => (
-              <Link href="/blog" key={i}>
+              <Link href={`/blog/${i + 1}`} key={i}>
                 <div className="relative flex flex-col items-center p-6 bg-white rounded shadow-xl cursor-pointer ">
                   <Image
                     className="md:max-w-none mx-auto rounded cursor-pointer hover:scale-125"

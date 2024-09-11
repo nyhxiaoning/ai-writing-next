@@ -17,11 +17,41 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function ArticlePage({ params }) {
+export default function ArticlePage({ params }: any) {
+  const solarTerms = [
+    "立春",
+    "雨水",
+    "惊蛰",
+    "春分",
+    "清明",
+    "谷雨",
+    "立夏",
+    "小满",
+    "芒种",
+    "夏至",
+    "小暑",
+    "大暑",
+    "立秋",
+    "处暑",
+    "白露",
+    "秋分",
+    "寒露",
+    "霜降",
+    "立冬",
+    "小雪",
+    "大雪",
+    "冬至",
+    "小寒",
+    "大寒",
+  ];
   const { id } = params;
+  // TODO：未来这里通过接口查找文章内容，在下面渲染
+  // TODO：未来这里通过接口查找文章内容，在下面渲染
+  // TODO：未来这里通过接口查找文章内容，在下面渲染
+  // TODO：未来这里通过接口查找文章内容，在下面渲染
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">文章标题{id}</h1>
+      <h1 className="text-3xl font-bold mb-4">{solarTerms[id - 1]}</h1>
       <p className="text-lg mb-6">
         这是一篇文章的内容，这里可以详细介绍文章的主题、观点和故事等。
       </p>

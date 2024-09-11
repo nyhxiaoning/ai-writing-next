@@ -25,7 +25,7 @@ export default function FeaturesBlocks() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
             {/* 1st row */}
             {Array.from({ length: 24 }, (_, i) => (
-              <Link href="/article-page" key={i}>
+              <Link href="/blog" key={i}>
                 <div className="relative flex flex-col items-center p-6 bg-white rounded shadow-xl cursor-pointer ">
                   <Image
                     className="md:max-w-none mx-auto rounded cursor-pointer hover:scale-125"

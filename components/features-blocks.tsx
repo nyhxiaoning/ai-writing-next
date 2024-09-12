@@ -1,7 +1,10 @@
+"use client";
+
 import FeaturesBg from "@/public/images/features-bg.png";
 import FeaturesBg1 from "@/public/images/features-bg春.jpeg";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
 
 const solarTerms = [
   "立春",
@@ -31,6 +34,20 @@ const solarTerms = [
 ];
 
 export default function FeaturesBlocks() {
+  useEffect(() => {
+    const scrollContainer = document.getElementById("scrollContainer");
+    let scrollAmount = 0;
+
+    const scrollHorizontally = () => {
+      scrollAmount += 1;
+      if (scrollContainer) {
+        scrollContainer.scrollLeft = scrollAmount;
+      }
+      requestAnimationFrame(scrollHorizontally);
+    };
+    requestAnimationFrame(scrollHorizontally);
+  }, []);
+
   return (
     <section className="relative">
       {/* Section background */}
@@ -48,17 +65,124 @@ export default function FeaturesBlocks() {
             <p className="text-xl text-gray-600">走过的日子，还是太快了。</p>
           </div>
 
-          {/* Items */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-            {/* 1st row */}
+          {/* Horizontal scroll container */}
+          <div
+            id="scrollContainer"
+            className="flex overflow-x-auto gap-6 pb-8"
+            style={{
+              scrollBehavior: "smooth",
+              animation: "scrollLeft 4s linear infinite",
+            }}
+          >
             {Array.from({ length: 24 }, (_, i) => (
               <Link href={`/blog/${i + 1}`} key={i}>
-                <div className="relative flex flex-col items-center p-6 bg-white rounded shadow-xl cursor-pointer ">
+                <div
+                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 bg-white rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
+                  style={{
+                    animation: `fadeIn 1s ease ${i * 0.2}s forwards, 
+                                transformToCircle 4s ease ${i * 0.3}s forwards`,
+                    opacity: 0,
+                    transform: "scale(0.5)",
+                  }}
+                >
                   <Image
-                    className="md:max-w-none mx-auto rounded cursor-pointer hover:scale-125"
+                    className="md:max-w-none mx-auto rounded-full"
                     src={i % 2 === 0 ? FeaturesBg1 : FeaturesBg1}
                     width={130}
-                    height="162"
+                    height={130}
+                    alt="Features bg"
+                  />
+                </div>
+              </Link>
+            ))}
+          </div>
+          {/* Horizontal scroll container */}
+          <div
+            id="scrollContainer"
+            className="flex overflow-x-auto gap-6 pb-8"
+            style={{
+              scrollBehavior: "smooth",
+              animation: "scrollLeft 4s linear infinite",
+            }}
+          >
+            {Array.from({ length: 24 }, (_, i) => (
+              <Link href={`/blog/${i + 1}`} key={i}>
+                <div
+                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 bg-white rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
+                  style={{
+                    animation: `fadeIn 1s ease ${i * 0.2}s forwards, 
+                                transformToCircle 4s ease ${i * 0.3}s forwards`,
+                    opacity: 0,
+                    transform: "scale(0.5)",
+                  }}
+                >
+                  <Image
+                    className="md:max-w-none mx-auto rounded-full"
+                    src={i % 2 === 0 ? FeaturesBg1 : FeaturesBg1}
+                    width={130}
+                    height={130}
+                    alt="Features bg"
+                  />
+                </div>
+              </Link>
+            ))}
+          </div>
+          {/* Horizontal scroll container */}
+          <div
+            id="scrollContainer"
+            className="flex overflow-x-auto gap-6 pb-8"
+            style={{
+              scrollBehavior: "smooth",
+              animation: "scrollLeft 4s linear infinite",
+            }}
+          >
+            {Array.from({ length: 24 }, (_, i) => (
+              <Link href={`/blog/${i + 1}`} key={i}>
+                <div
+                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 bg-white rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
+                  style={{
+                    animation: `fadeIn 1s ease ${i * 0.2}s forwards, 
+                                transformToCircle 4s ease ${i * 0.3}s forwards`,
+                    opacity: 0,
+                    transform: "scale(0.5)",
+                  }}
+                >
+                  <Image
+                    className="md:max-w-none mx-auto rounded-full"
+                    src={i % 2 === 0 ? FeaturesBg1 : FeaturesBg1}
+                    width={130}
+                    height={130}
+                    alt="Features bg"
+                  />
+                </div>
+              </Link>
+            ))}
+          </div>
+          {/* Horizontal scroll container */}
+          <div
+            id="scrollContainer"
+            className="flex overflow-x-auto gap-6 pb-8"
+            style={{
+              scrollBehavior: "smooth",
+              animation: "scrollLeft 4s linear infinite",
+            }}
+          >
+            {Array.from({ length: 24 }, (_, i) => (
+              <Link href={`/blog/${i + 1}`} key={i}>
+                <div
+                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 bg-white rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
+                  style={{
+                    animation: `fadeIn 1s ease ${i * 0.5}s forwards, 
+                                transformToCircle 4s ease ${i * 0.5}s forwards`,
+                    opacity: 0,
+                    transform: "scale(1)",
+                  }}
+                >
+                  <Image
+                    className="md:max-w-none mx-auto rounded-full"
+                    src={i % 2 === 0 ? FeaturesBg1 : FeaturesBg1}
+                    width={130}
+                    height={130}
                     alt="Features bg"
                   />
                 </div>
@@ -67,6 +191,29 @@ export default function FeaturesBlocks() {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes transformToCircle {
+          to {
+            transform: scale(1);
+          }
+        }
+
+        @keyframes scrollLeft {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
+        }
+      `}</style>
     </section>
   );
 }

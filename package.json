@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
+    "@prisma/client": "^5.19.1",
     "@react-spring/web": "^9.7.4",
     "@types/lodash.shuffle": "^4.2.9",
     "@types/node": "^20.10.4",
@@ -19,7 +20,9 @@
     "add": "^2.0.6",
     "aos": "^3.0.0-beta.6",
     "lodash.shuffle": "^4.2.0",
+    "mysql2": "^3.11.2",
     "next": "^14.0.4",
+    "prisma": "^5.19.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "sass": "^1.78.0",

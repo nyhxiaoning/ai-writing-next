@@ -2,13 +2,13 @@
  * @Author: ningyongheng ningyongheng@jeejio.com
  * @Date: 2024-09-11 14:34:38
  * @LastEditors: ningyongheng ningyongheng@jeejio.com
- * @LastEditTime: 2024-09-13 14:10:02
+ * @LastEditTime: 2024-09-13 15:51:18
  * @FilePath: /tailwind-landing-page-template/app/blog/[id]/page.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import Image from "next/image";
 import Link from "next/link";
-
+import handler from "./../../api/users"
 // TODO:解决静态导出的路由匹配问题
 // generateStaticParams 用来指定哪些动态路由页面需要被预生成
 export async function generateStaticParams() {

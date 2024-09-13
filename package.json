@@ -26,7 +26,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "sass": "^1.78.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vec-la": "^1.5.0"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",

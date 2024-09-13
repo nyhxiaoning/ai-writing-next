@@ -1,9 +1,14 @@
 "use client";
 
+import { animated, config, to, useSpring } from '@react-spring/web'
+import { dist, scale } from 'vec-la'
+
 import FeaturesBg from "@/public/images/features-bg.png";
 import FeaturesBg1 from "@/public/images/features-bg春.jpeg";
 import Image from "next/image";
 import Link from "next/link";
+import styles from "./index.module.css"
+import { useDrag } from '@use-gesture/react'
 import { useEffect } from "react";
 
 const solarTerms = [
@@ -34,6 +39,35 @@ const solarTerms = [
 ];
 
 export default function FeaturesBlocks() {
+  const [{ pos }, api] = useSpring(() => ({ pos: [0, 0] }))
+  const [{ angle }, angleApi] = useSpring(() => ({
+    angle: 0,
+    config: config.wobbly,
+  }))
+  // direction calculates pointer direction
+  // memo is like a cache, it contains the values that you return inside "set"
+  // this way we can inject the springs current coordinates on the initial event and
+  // add movement to it for convenience
+
+  const bind = useDrag(
+    (state) => {
+      const { xy, down, movement: pos, velocity, direction } = state;
+
+      api.start({
+        pos,
+        immediate: down,
+        config: { velocity: scale(direction, velocity), decay: true },
+      });
+
+      // 使用状态的变化计算位置差异
+      const distance = dist(xy, state.offset);
+      if (distance > 10 || !down) {
+        angleApi.start({ angle: Math.atan2(direction[0], -direction[1]) });
+      }
+    },
+    { from: (state) => state.offset } // 使用 `from` 选项初始化
+  );
+  
   useEffect(() => {
     const scrollContainer = document.getElementById("scrollContainer");
     let scrollAmount = 0;
@@ -56,7 +90,18 @@ export default function FeaturesBlocks() {
         aria-hidden="true"
       ></div>
       <div className="absolute left-0 right-0 bottom-0 m-auto w-px p-px h-20 bg-gray-200 transform translate-y-1/2"></div>
-
+      <animated.div
+        className={styles.rocket}
+        {...bind()}
+        style={{
+          transform: to(
+            [pos, angle],
+            // @ts-ignore
+            ([x, y], a) => `translate3d(${x}px,${y}px,0) rotate(${a}rad)`
+          ),
+        }}
+      />
+      )
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         <div className="py-12 md:py-20">
           {/* Section header */}

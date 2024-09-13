@@ -1,0 +1,69 @@
+.body {
+  background-color: #171717;
+  width: 100%;
+  height: 100%;
+}
+
+.textaligncontent{
+
+    display: flex;
+      /* 启用 flex 布局 */
+      justify-content: center;
+      /* 水平居中（如果需要） */
+      align-items: center;
+      /* 垂直居中 */
+      height: 100%;
+}
+
+.bottomposdock{
+    position: fixed;
+      /* 固定定位 */
+      bottom: 0;
+      /* 距离底部 0 */
+      left: 0;
+      /* 距离左边 0 */
+      width: 100%;
+      /* 占据整个宽度 */
+      z-index: 1000;
+      /* 使其在其他元素之上 */
+      background-color: #fff;
+      /* 可选的背景色 */
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+      /* 可选的阴影效果 */
+}
+
+.list {
+  position: relative;
+  width: 65vw;
+  max-width: 100%;
+  height: calc(100%);
+  margin: 0 auto;
+}
+
+.card {
+  position: absolute;
+  will-change: transform, height, opacity;
+  width: 100%;
+}
+
+.cell {
+  position: relative;
+  background-size: cover;
+  width: 100%;
+  height: calc(100%);
+  overflow: hidden;
+  text-transform: uppercase;
+  font-size: 10px;
+  line-height: 10px;
+  padding: 15px;
+}
+
+.details {
+  position: relative;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  box-shadow: 0px 10px 25px -10px rgba(0, 0, 0, 0.2);
+}

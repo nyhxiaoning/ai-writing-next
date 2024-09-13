@@ -1,3 +1,11 @@
+/*
+ * @Author: ningyongheng ningyongheng@jeejio.com
+ * @Date: 2024-09-11 14:34:38
+ * @LastEditors: ningyongheng ningyongheng@jeejio.com
+ * @LastEditTime: 2024-09-13 14:10:02
+ * @FilePath: /tailwind-landing-page-template/app/blog/[id]/page.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import Image from "next/image";
 import Link from "next/link";
 
@@ -51,7 +59,7 @@ export default function ArticlePage({ params }: any) {
   // TODO：未来这里通过接口查找文章内容，在下面渲染
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">{solarTerms[id - 1]}</h1>
+      <h1 className="text-3xl font-bold mb-4">{solarTerms[id - 1]}: 走走停停</h1>
       <p className="text-lg mb-6">
         这是一篇文章的内容，这里可以详细介绍文章的主题、观点和故事等。
       </p>

@@ -2,6 +2,7 @@
 
 import { animated, config, to, useSpring } from '@react-spring/web'
 import { dist, scale } from 'vec-la'
+import { useEffect, useState } from "react";
 
 import FeaturesBg from "@/public/images/features-bg.png";
 import FeaturesBg1 from "@/public/images/features-bg春.jpeg";
@@ -9,7 +10,6 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./index.module.css"
 import { useDrag } from '@use-gesture/react'
-import { useEffect } from "react";
 
 const solarTerms = [
   "立春",
@@ -39,6 +39,22 @@ const solarTerms = [
 ];
 
 export default function FeaturesBlocks() {
+  // const [isPaused, setIsPaused] = useState(false);
+
+  const { value } = useSpring({
+    // NOTE:这里透明色过渡：这里from和to如果值，比较接近，那么图片变化不明显；
+    // 如果from和to值相差比较大，那么图片变化明显；
+    from: {
+      value: 0.3,
+    },
+    to: {
+      value: 0.6,
+    },
+    loop: true,
+    config: {
+      duration: 8000,
+    },
+  })
   const [{ pos }, api] = useSpring(() => ({ pos: [0, 0] }))
   const [{ angle }, angleApi] = useSpring(() => ({
     angle: 0,
@@ -77,19 +93,17 @@ export default function FeaturesBlocks() {
       if (scrollContainer) {
         scrollContainer.scrollLeft = scrollAmount;
       }
-      requestAnimationFrame(scrollHorizontally);
+      // if (!isPaused) {
+        requestAnimationFrame(scrollHorizontally);
+      // }
     };
     requestAnimationFrame(scrollHorizontally);
   }, []);
 
   return (
     <section className="relative">
-      {/* Section background */}
-      <div
-        className="absolute inset-0 top-1/2 md:mt-24 lg:mt-0 bg-gray-900 pointer-events-none"
-        aria-hidden="true"
-      ></div>
-      <div className="absolute left-0 right-0 bottom-0 m-auto w-px p-px h-20 bg-gray-200 transform translate-y-1/2"></div>
+
+      {/* <div className="absolute left-0 right-0 bottom-0 m-auto w-px p-px h-20 bg-gray-200 transform translate-y-1/2"></div> */}
       <animated.div
         className={styles.rocket}
         {...bind()}
@@ -103,6 +117,17 @@ export default function FeaturesBlocks() {
       />
       )
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+        <animated.div
+          style={{
+            x: value.to({
+              output: ['0%', '-5%', '-15%', '7%', '-5%', '-15%', '15%', '0%', '3%', '-10%'],
+            }),
+            y: value.to({
+              output: ['0%', '-10%', '5%', '-25%', '25%', '10%', '0%', '15%', '35%', '10%'],
+            }),
+          }}
+          className={styles.noise}
+        />
         <div className="py-12 md:py-20">
           {/* Section header */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
@@ -113,16 +138,17 @@ export default function FeaturesBlocks() {
           {/* Horizontal scroll container */}
           <div
             id="scrollContainer"
-            className="flex overflow-x-auto gap-6 pb-8"
+            className="flex gap-6 pb-8"
             style={{
+              height:'300px',
               scrollBehavior: "smooth",
               animation: "scrollLeft 4s linear infinite",
             }}
           >
-            {Array.from({ length: 24 }, (_, i) => (
+            {Array.from({ length: 6 }, (_, i) => (
               <Link href={`/blog/${i + 1}`} key={i}>
                 <div
-                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 bg-white rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
+                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6  rounded-full shadow-xl cursor-pointer  transition-all duration-700"
                   style={{
                     animation: `fadeIn 1s ease ${i * 0.2}s forwards, 
                                 transformToCircle 4s ease ${i * 0.3}s forwards`,
@@ -144,16 +170,17 @@ export default function FeaturesBlocks() {
           {/* Horizontal scroll container */}
           <div
             id="scrollContainer"
-            className="flex overflow-x-auto gap-6 pb-8"
+            className="flex  gap-6 pb-8"
             style={{
+              height: '300px',
               scrollBehavior: "smooth",
               animation: "scrollLeft 4s linear infinite",
             }}
           >
-            {Array.from({ length: 24 }, (_, i) => (
+            {Array.from({ length: 6 }, (_, i) => (
               <Link href={`/blog/${i + 1}`} key={i}>
                 <div
-                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 bg-white rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
+                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
                   style={{
                     animation: `fadeIn 1s ease ${i * 0.2}s forwards, 
                                 transformToCircle 4s ease ${i * 0.3}s forwards`,
@@ -172,19 +199,21 @@ export default function FeaturesBlocks() {
               </Link>
             ))}
           </div>
+       
           {/* Horizontal scroll container */}
           <div
             id="scrollContainer"
-            className="flex overflow-x-auto gap-6 pb-8"
+            className="flex gap-6 pb-8"
             style={{
+              height: '300px',
               scrollBehavior: "smooth",
               animation: "scrollLeft 4s linear infinite",
             }}
           >
-            {Array.from({ length: 24 }, (_, i) => (
+            {Array.from({ length: 6 }, (_, i) => (
               <Link href={`/blog/${i + 1}`} key={i}>
                 <div
-                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 bg-white rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
+                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6  rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
                   style={{
                     animation: `fadeIn 1s ease ${i * 0.2}s forwards, 
                                 transformToCircle 4s ease ${i * 0.3}s forwards`,
@@ -203,19 +232,21 @@ export default function FeaturesBlocks() {
               </Link>
             ))}
           </div>
+         
           {/* Horizontal scroll container */}
           <div
             id="scrollContainer"
-            className="flex overflow-x-auto gap-6 pb-8"
+            className="flex gap-6 pb-8"
             style={{
+              height: '300px',
               scrollBehavior: "smooth",
               animation: "scrollLeft 4s linear infinite",
             }}
           >
-            {Array.from({ length: 24 }, (_, i) => (
+            {Array.from({ length: 6 }, (_, i) => (
               <Link href={`/blog/${i + 1}`} key={i}>
                 <div
-                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 bg-white rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
+                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6  rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
                   style={{
                     animation: `fadeIn 1s ease ${i * 0.5}s forwards, 
                                 transformToCircle 4s ease ${i * 0.5}s forwards`,

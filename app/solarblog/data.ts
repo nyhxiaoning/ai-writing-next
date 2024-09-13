@@ -1,8 +1,8 @@
 export default [
   {
-    name: "Saint Petersburg",
+    name: "立春：所见所闻",
     description: "#f5f7fa → #c3cfe2",
-    css: "linear-gradient(135deg, #c3cfe2 0%, #c3cfe2 100%)",
+    css: "立春所见所闻立春所见所闻立春所见所闻立春所见所闻立春所见所闻linear-gradient(135deg, #c3cfe2 0%, #c3cfe2 100%)",
     height: 250,
     link: 1,
   },
@@ -26,13 +26,6 @@ export default [
     css: "linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)",
     height: 250,
     link: 4,
-  },
-  {
-    name: "Wild Apple",
-    description: "#d299c2 → #fef9d7",
-    css: "linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)",
-    height: 250,
-    link: 5,
   },
   {
     name: "Ladoga Bottom",

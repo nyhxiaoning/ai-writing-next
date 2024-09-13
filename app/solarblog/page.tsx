@@ -2,7 +2,7 @@
  * @Author: ningyongheng ningyongheng@jeejio.com
  * @Date: 2024-09-13 13:14:40
  * @LastEditors: ningyongheng ningyongheng@jeejio.com
- * @LastEditTime: 2024-09-13 14:12:58
+ * @LastEditTime: 2024-09-13 18:23:59
  * @FilePath: /tailwind-landing-page-template/app/blog/page.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -12,7 +12,7 @@
  * 设计1-24节气表：设计表：处理这里的时候，这里内容配置mysql
  */
 import React, { useEffect, useState } from "react";
-import { animated, useTransition } from "@react-spring/web";
+import { animated, useSpring, useTransition } from "@react-spring/web";
 
 import { Card } from "./components/Card/index.tsx";
 import { Dock } from "./components/Dock/index.tsx";
@@ -35,6 +35,18 @@ const GRADIENTS = [
 ];
 
 const PageMenu = () => {
+  const { value } = useSpring({
+    from: {
+      value: 0.3,
+    },
+    to: {
+      value: 0.6,
+    },
+    loop: true,
+    config: {
+      duration: 8000,
+    },
+  })
      const [rows, set] = useState(data);
      useEffect(() => {
        const t = setInterval(() => set(shuffle), 2000);
@@ -59,7 +71,19 @@ const PageMenu = () => {
      
   return (
     <div className={styles.body}>
+    
       <div className={styles.list} style={{ height }}>
+        <animated.div
+          style={{
+            x: value.to({
+              output: ['0%', '-5%', '-15%', '7%', '-5%', '-15%', '15%', '0%', '3%', '-10%'],
+            }),
+            y: value.to({
+              output: ['0%', '-10%', '5%', '-25%', '25%', '10%', '0%', '15%', '35%', '10%'],
+            }),
+          }}
+          className={styles.noise}
+        />
         {transitions((style, item, t, index) => (
           <animated.div
             className={styles.card}
@@ -72,7 +96,7 @@ const PageMenu = () => {
               />
             </div>
             <div className={styles.textaligncontent}>
-              <Link legacyBehavior href={`/blog/${item.link}`}>
+              <Link legacyBehavior href={`/solarblog/${item.link}`}>
                 <a> {item.name}</a>
               </Link>
             </div>

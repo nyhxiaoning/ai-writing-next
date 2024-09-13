@@ -1,13 +1,28 @@
 .rocket {
     background: url(/r.png) no-repeat;
     background-size: contain;
-    width: 140px;
-    height: 140px;
+    width: 190px;
+    height: 190px;
     cursor: -webkit-grab;
+    /* z-index: 1000; */
     will-change: transform;
     user-select: none;
 }
 
 .rocket:active {
     cursor: -webkit-grabbing;
+}
+
+.noise {
+    opacity: 0.3;
+    inset: -30%;
+    width: 800%;
+    scale: 8;
+    height: 800%;
+    position: absolute;
+    background-size: 1000px 1000px;
+    background-repeat: no-repeat;
+    /* 或使用public相对地址：./noise.png */
+    background: url('https://thumb.ac-illust.com/a9/a9c7c9a2d474ffe508280d63b0e85fde_t.jpeg');
+    /* background: url('https://framerusercontent.com/images/rR6HYXBrMmX4cRpXfXUOvpvpB0.png'); */
 }

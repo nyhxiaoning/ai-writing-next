@@ -38,6 +38,9 @@ dependencies:
   '@prisma/client':
     specifier: ^5.19.1
     version: 5.19.1(prisma@5.19.1)
+  '@react-spring/parallax':
+    specifier: ^9.7.4
+    version: 9.7.4(react-dom@18.2.0)(react@18.2.0)
   '@react-spring/web':
     specifier: ^9.7.4
     version: 9.7.4(react-dom@18.2.0)(react@18.2.0)
@@ -449,6 +452,18 @@ packages:
       '@react-spring/shared': 9.7.4(react@18.2.0)
       '@react-spring/types': 9.7.4
       react: 18.2.0
+    dev: false
+
+  /@react-spring/parallax@9.7.4(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-JIEu1dVJnFKjP+6z83iAt9SChoogV9IDKHIAoMeh4fhtiFxcGDLqqjAY8WW9VzYJJL9fWP1Yi1FoOafGQtn1sA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@react-spring/shared': 9.7.4(react@18.2.0)
+      '@react-spring/web': 9.7.4(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@react-spring/rafz@9.7.4:

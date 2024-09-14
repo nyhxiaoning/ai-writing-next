@@ -47,6 +47,9 @@ dependencies:
   '@react-spring/web':
     specifier: ^9.7.4
     version: 9.7.4(react-dom@18.2.0)(react@18.2.0)
+  '@stitches/react':
+    specifier: ^1.2.8
+    version: 1.2.8(react@18.2.0)
   '@types/lodash.shuffle':
     specifier: ^4.2.9
     version: 4.2.9
@@ -86,6 +89,9 @@ dependencies:
   react-dom:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
+  react-use-measure:
+    specifier: ^2.1.1
+    version: 2.1.1(react-dom@18.2.0)(react@18.2.0)
   sass:
     specifier: ^1.78.0
     version: 1.78.0
@@ -510,6 +516,14 @@ packages:
       '@react-spring/types': 9.7.4
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@stitches/react@1.2.8(react@18.2.0):
+    resolution: {integrity: sha512-9g9dWI4gsSVe8bNLlb+lMkBYsnIKCZTmvqvDG+Avnn69XfmHZKiaMrx7cgTaddq7aTPPmXiTsbFcUy0xgI4+wA==}
+    peerDependencies:
+      react: '>= 16.3.0'
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /@swc/helpers@0.5.2:
@@ -1201,6 +1215,10 @@ packages:
 
   /dayjs@1.11.13:
     resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
+    dev: false
+
+  /debounce@1.2.1:
+    resolution: {integrity: sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug==}
     dev: false
 
   /debug@4.3.7:
@@ -2405,6 +2423,17 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.2
+    dev: false
+
+  /react-use-measure@2.1.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-nocZhN26cproIiIduswYpV5y5lQpSQS1y/4KuvUCjSKmw7ZWIS/+g3aFnX3WdBkyuGUtTLif3UTqnLLhbDoQig==}
+    peerDependencies:
+      react: '>=16.13'
+      react-dom: '>=16.13'
+    dependencies:
+      debounce: 1.2.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /react@18.2.0:

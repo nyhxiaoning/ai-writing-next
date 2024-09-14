@@ -1,296 +1,151 @@
-"use client";
+"use client"
 
-import { animated, config, to, useSpring } from '@react-spring/web'
-// @ts-ignore
-import { dist, scale } from 'vec-la'
-import { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { a, animated, useTrail, useTransition } from '@react-spring/web'
 
-import FeaturesBg from "@/public/images/features-bg.png";
-import FeaturesBg1 from "@/public/images/features-bg春.jpeg";
-import Image from "next/image";
-import Link from "next/link";
-import styles from "./index.module.css"
-import { useDrag } from '@use-gesture/react'
+import data from './data'
+import shuffle from 'lodash.shuffle'
+import { styled } from '@stitches/react'
+import styles from './index.module.css'
+import useMeasure from 'react-use-measure'
+import useMedia from './useMedia'
 
-const solarTerms = [
-  "立春",
-  "雨水",
-  "惊蛰",
-  "春分",
-  "清明",
-  "谷雨",
-  "立夏",
-  "小满",
-  "芒种",
-  "夏至",
-  "小暑",
-  "大暑",
-  "立秋",
-  "处暑",
-  "白露",
-  "秋分",
-  "寒露",
-  "霜降",
-  "立冬",
-  "小雪",
-  "大雪",
-  "冬至",
-  "小寒",
-  "大寒",
-];
+const Container = styled('div', {
+  display: 'flex',
+  gap: 10,
+  marginBottom: 80,
+})
 
-export default function FeaturesBlocks() {
-  // const [isPaused, setIsPaused] = useState(false);
+const Box = styled('div', {
+  position: 'relative',
+  height: 50,
+  width: 50,
+})
 
-  const { value } = useSpring({
-    // NOTE:这里透明色过渡：这里from和to如果值，比较接近，那么图片变化不明显；
-    // 如果from和to值相差比较大，那么图片变化明显；
-    from: {
-      value: 0.3,
-    },
-    to: {
-      value: 0.6,
-    },
-    loop: true,
-    config: {
-      duration: 8000,
-    },
-  })
-  const [{ pos }, api] = useSpring(() => ({ pos: [0, 0] }))
-  const [{ angle }, angleApi] = useSpring(() => ({
-    angle: 0,
-    config: config.wobbly,
+const SharedStyles = {
+  width: '100%',
+  height: '100%',
+  position: 'absolute',
+  inset: 0,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontFamily: 'Helvetica',
+  fontWeight: 800,
+  backfaceVisibility: 'hidden',
+}
+
+const FrontBox = styled(animated.div, {
+  ...SharedStyles,
+  backgroundColor: '#fafafa',
+  border: 'solid 2px #1a1a1a',
+})
+
+const BackBox = styled(animated.div, {
+  ...SharedStyles,
+  backgroundColor: '#6cab64',
+  border: 'solid 2px #6cab64',
+  color: '#fafafa',
+})
+
+const itemscurrent = ['修', '己', '以', '敬', ',', '文', '质', '彬', '彬']
+
+
+export default function Masonry() {
+  const [trail, api] = useTrail(itemscurrent.length, () => ({
+    rotateX: 0,
   }))
-  // direction calculates pointer direction
-  // memo is like a cache, it contains the values that you return inside "set"
-  // this way we can inject the springs current coordinates on the initial event and
-  // add movement to it for convenience
 
-  const bind = useDrag(
-    (state) => {
-      const { xy, down, movement: pos, velocity, direction } = state;
+  const isFlipped = useRef(false)
 
+  const handleClick = () => {
+    if (isFlipped.current) {
       api.start({
-        pos,
-        immediate: down,
-        config: { velocity: scale(direction, velocity), decay: true },
-      });
-
-      // 使用状态的变化计算位置差异
-      const distance = dist(xy, state.offset);
-      if (distance > 10 || !down) {
-        angleApi.start({ angle: Math.atan2(direction[0], -direction[1]) });
-      }
+        rotateX: 0,
+      })
+      isFlipped.current = false
+    } else {
+      api.start({
+        rotateX: 180,
+      })
+      isFlipped.current = true
+    }
+  }
+  const reftwo = useRef<ReturnType<typeof setTimeout>[]>([])
+  const [itemstwo, settwo] = useState<string[]>([])
+  const transitionstwo = useTransition(itemstwo, {
+    from: {
+      opacity: 0,
+      height: 0,
+      innerHeight: 0,
+      transform: 'perspective(600px) rotateX(0deg)',
+      color: '#8fa5b6',
     },
-    { from: (state) => state.offset } // 使用 `from` 选项初始化
-  );
-  
+    enter: [
+      { opacity: 1, height: 80, innerHeight: 80 },
+      { transform: 'perspective(600px) rotateX(180deg)', color: '#28d79f' },
+      { transform: 'perspective(600px) rotateX(0deg)' },
+    ],
+    leave: [{ color: '#c23369' }, { innerHeight: 0 }, { opacity: 0, height: 0 }],
+    update: { color: '#28b4d7' },
+  })
+
+  const reset = useCallback(() => {
+    reftwo.current.forEach(clearTimeout)
+    reftwo.current = []
+    settwo([])
+    reftwo.current.push(setTimeout(() => settwo(['欢迎来到文字世界', '文字塑造时间', '文字塑造回忆']), 2000))
+    reftwo.current.push(setTimeout(() => settwo(['欢迎来到文字世界', '文字塑造时间']), 5000))
+    reftwo.current.push(setTimeout(() => settwo(['欢迎来到文字世界', '文字塑造时间', '文字塑造回忆']), 8000))
+  }, [])
+
   useEffect(() => {
-    const scrollContainer = document.getElementById("scrollContainer");
-    let scrollAmount = 0;
+    reset()
+    return () => reftwo.current.forEach(clearTimeout)
+  }, [])
 
-    const scrollHorizontally = () => {
-      scrollAmount += 1;
-      if (scrollContainer) {
-        scrollContainer.scrollLeft = scrollAmount;
-      }
-      // if (!isPaused) {
-        requestAnimationFrame(scrollHorizontally);
-      // }
-    };
-    requestAnimationFrame(scrollHorizontally);
-  }, []);
-
+  // Hook1: Tie media queries to the number of columns
+  const columns = useMedia(['(min-width: 1500px)', '(min-width: 1000px)', '(min-width: 600px)'], [5, 4, 3], 2)
+  // Hook2: Measure the width of the container element
+  const [ref, { width }] = useMeasure()
+  // Hook3: Hold items
+  const [items, set] = useState(data)
+  // Hook4: shuffle data every 2 seconds
+  useEffect(() => {
+    const t = setInterval(() => set(shuffle), 2000)
+    return () => clearInterval(t)
+  }, [])
+  // Hook5: Form a grid of stacked items using width & columns we got from hooks 1 & 2
+  const [heights, gridItems] = useMemo(() => {
+    let heights = new Array(columns).fill(0) // Each column gets a height starting with zero
+    let gridItems = items.map((child, i) => {
+      const column = heights.indexOf(Math.min(...heights)) // Basic masonry-grid placing, puts tile into the smallest column using Math.min
+      const x = (width / columns) * column // x = container width / number of columns * column index,
+      const y = (heights[column] += child.height / 2) - child.height / 2 // y = it's just the height of the current column
+      return { ...child, x, y, width: width / columns, height: child.height / 2 }
+    })
+    return [heights, gridItems]
+  }, [columns, items, width])
+  // Hook6: Turn the static grid values into animated transitions, any addition, removal or change will be animated
+  const transitions = useTransition(gridItems, {
+    key: (item: { css: string; height: number }) => item.css,
+    from: ({ x, y, width, height }) => ({ x, y, width, height, opacity: 0 }),
+    enter: ({ x, y, width, height }) => ({ x, y, width, height, opacity: 1 }),
+    update: ({ x, y, width, height }) => ({ x, y, width, height }),
+    leave: { height: 0, opacity: 0 },
+    config: { mass: 5, tension: 500, friction: 100 },
+    trail: 25,
+  })
+  // Render the grid
   return (
-    <section className="relative">
-
-      {/* <div className="absolute left-0 right-0 bottom-0 m-auto w-px p-px h-20 bg-gray-200 transform translate-y-1/2"></div> */}
-      <animated.div
-        className={styles.rocket}
-        {...bind()}
-        style={{
-          transform: to(
-            [pos, angle],
-            // @ts-ignore
-            ([x, y], a) => `translate3d(${x}px,${y}px,0) rotate(${a}rad)`
-          ),
-        }}
-      />
-      )
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
-        <animated.div
-          style={{
-            x: value.to({
-              output: ['0%', '-5%', '-15%', '7%', '-5%', '-15%', '15%', '0%', '3%', '-10%'],
-            }),
-            y: value.to({
-              output: ['0%', '-10%', '5%', '-25%', '25%', '10%', '0%', '15%', '35%', '10%'],
-            }),
-          }}
-          className={styles.noise}
-        />
-        <div className="py-12 md:py-20">
-          {/* Section header */}
-          <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
-            <h2 className="h2 mb-4">写给生活的二十四节气</h2>
-            <p className="text-xl text-gray-600">走过的日子，还是太快了。</p>
-          </div>
-
-          {/* Horizontal scroll container */}
-          <div
-            id="scrollContainer"
-            className="flex gap-6 pb-8"
-            style={{
-              height:'300px',
-              scrollBehavior: "smooth",
-              animation: "scrollLeft 4s linear infinite",
-            }}
-          >
-            {Array.from({ length: 6 }, (_, i) => (
-              <Link href={`/solarmenu?${solarTerms[i + 1]}`} key={i}>
-                <div
-                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6  rounded-full shadow-xl cursor-pointer  transition-all duration-700"
-                  style={{
-                    animation: `fadeIn 1s ease ${i * 0.2}s forwards, 
-                                transformToCircle 4s ease ${i * 0.3}s forwards`,
-                    opacity: 0,
-                    transform: "scale(0.5)",
-                  }}
-                >
-                  <Image
-                    className="md:max-w-none mx-auto rounded-full"
-                    src={i % 2 === 0 ? FeaturesBg1 : FeaturesBg1}
-                    width={130}
-                    height={130}
-                    alt="Features bg"
-                  />
-                </div>
-              </Link>
-            ))}
-          </div>
-          {/* Horizontal scroll container */}
-          <div
-            id="scrollContainer"
-            className="flex  gap-6 pb-8"
-            style={{
-              height: '300px',
-              scrollBehavior: "smooth",
-              animation: "scrollLeft 4s linear infinite",
-            }}
-          >
-            {Array.from({ length: 6 }, (_, i) => (
-              <Link href={`/solarmenu?${solarTerms[i + 6]}`} key={i}>
-                <div
-                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
-                  style={{
-                    animation: `fadeIn 1s ease ${i * 0.2}s forwards, 
-                                transformToCircle 4s ease ${i * 0.3}s forwards`,
-                    opacity: 0,
-                    transform: "scale(0.5)",
-                  }}
-                >
-                  <Image
-                    className="md:max-w-none mx-auto rounded-full"
-                    src={i % 2 === 0 ? FeaturesBg1 : FeaturesBg1}
-                    width={130}
-                    height={130}
-                    alt="Features bg"
-                  />
-                </div>
-              </Link>
-            ))}
-          </div>
-       
-          {/* Horizontal scroll container */}
-          <div
-            id="scrollContainer"
-            className="flex gap-6 pb-8"
-            style={{
-              height: '300px',
-              scrollBehavior: "smooth",
-              animation: "scrollLeft 4s linear infinite",
-            }}
-          >
-            {Array.from({ length: 6 }, (_, i) => (
-              <Link href={`/solarmenu?${solarTerms[i + 12]}`} key={i}>
-                <div
-                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6  rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
-                  style={{
-                    animation: `fadeIn 1s ease ${i * 0.2}s forwards, 
-                                transformToCircle 4s ease ${i * 0.3}s forwards`,
-                    opacity: 0,
-                    transform: "scale(0.5)",
-                  }}
-                >
-                  <Image
-                    className="md:max-w-none mx-auto rounded-full"
-                    src={i % 2 === 0 ? FeaturesBg1 : FeaturesBg1}
-                    width={130}
-                    height={130}
-                    alt="Features bg"
-                  />
-                </div>
-              </Link>
-            ))}
-          </div>
-         
-          {/* Horizontal scroll container */}
-          <div
-            id="scrollContainer"
-            className="flex gap-6 pb-8"
-            style={{
-              height: '300px',
-              scrollBehavior: "smooth",
-              animation: "scrollLeft 4s linear infinite",
-            }}
-          >
-            {Array.from({ length: 6 }, (_, i) => (
-              <Link href={`/solarmenu?${solarTerms[i + 18]}`} key={i}>
-                <div
-                  className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6  rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
-                  style={{
-                    animation: `fadeIn 1s ease ${i * 0.5}s forwards, 
-                                transformToCircle 4s ease ${i * 0.5}s forwards`,
-                    opacity: 0,
-                    transform: "scale(1)",
-                  }}
-                >
-                  <Image
-                    className="md:max-w-none mx-auto rounded-full"
-                    src={i % 2 === 0 ? FeaturesBg1 : FeaturesBg1}
-                    width={130}
-                    height={130}
-                    alt="Features bg"
-                  />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
+    <div ref={ref} className={styles.list} style={{ height: Math.max(...heights) }}>
+      {transitions((style, item) => (
+        <a.div style={style}>
+          <div style={{ backgroundImage: `url(${item.css}?auto=compress&dpr=2&h=500&w=500)` }} />
+        </a.div>
+      ))}
+      <div>
       </div>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes transformToCircle {
-          to {
-            transform: scale(1);
-          }
-        }
-
-        @keyframes scrollLeft {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-100%);
-          }
-        }
-      `}</style>
-    </section>
-  );
+    </div>
+  )
 }

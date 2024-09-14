@@ -35,6 +35,9 @@ dependencies:
   '@headlessui/react':
     specifier: ^1.7.17
     version: 1.7.17(react-dom@18.2.0)(react@18.2.0)
+  '@heroicons/react':
+    specifier: ^2.1.5
+    version: 2.1.5(react@18.2.0)
   '@prisma/client':
     specifier: ^5.19.1
     version: 5.19.1(prisma@5.19.1)
@@ -86,6 +89,9 @@ dependencies:
   sass:
     specifier: ^1.78.0
     version: 1.78.0
+  solid:
+    specifier: link:@heroicons/react/20/solid
+    version: link:@heroicons/react/20/solid
   typescript:
     specifier: ^5.3.3
     version: 5.3.3
@@ -223,6 +229,14 @@ packages:
       client-only: 0.0.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@heroicons/react@2.1.5(react@18.2.0):
+    resolution: {integrity: sha512-FuzFN+BsHa+7OxbvAERtgBTNeZpUjgM/MIizfVkSCL2/edriN0Hx/DWRCR//aPYwO5QX/YlgLGXk+E3PcfZwjA==}
+    peerDependencies:
+      react: '>= 16'
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /@isaacs/cliui@8.0.2:

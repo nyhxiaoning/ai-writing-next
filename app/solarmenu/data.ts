@@ -32,13 +32,13 @@ export default [
     description: "#ebc0fd → #d9ded8",
     css: "linear-gradient(135deg, #ebc0fd 0%, #d9ded8 100%)",
     height: 250,
-    link: 6,
+    link: 5,
   },
   {
     name: "Sunny Morning",
     description: "#f6d365 → #fda085",
     css: "linear-gradient(120deg, #f6d365 0%, #fda085 100%)",
     height: 250,
-    link: 7,
+    link: 6,
   },
 ];

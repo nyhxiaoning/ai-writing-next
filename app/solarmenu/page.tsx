@@ -2,7 +2,7 @@
  * @Author: ningyongheng ningyongheng@jeejio.com
  * @Date: 2024-09-13 13:14:40
  * @LastEditors: ningyongheng ningyongheng@jeejio.com
- * @LastEditTime: 2024-09-14 09:52:48
+ * @LastEditTime: 2024-09-14 14:52:50
  * @FilePath: /tailwind-landing-page-template/app/blog/page.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -13,6 +13,7 @@
  */
 import React, { useEffect, useState } from "react";
 import { animated, useSpring, useTransition } from "@react-spring/web";
+import { useParams, usePathname, useRouter, useSelectedLayoutSegment } from 'next/navigation'
 
 import { Card } from "./components/Card/index.tsx";
 import { Dock } from "./components/Dock/index.tsx";
@@ -34,6 +35,9 @@ const GRADIENTS = [
 ];
 
 const PageMenu = () => {
+  const [url, setUrl] = useState('')
+  const [solarName, setSolarName] = useState('')
+  debugger
   const { value } = useSpring({
     from: {
       value: 0.3,
@@ -48,6 +52,10 @@ const PageMenu = () => {
   })
      const [rows, set] = useState(data);
      useEffect(() => {
+       if (typeof window !== 'undefined') {
+         setUrl(window.location.href) // 获取完整的 URL
+         debugger
+       }
        const t = setInterval(() => set(shuffle), 2000);
        return () => clearInterval(t);
      }, []);
@@ -70,7 +78,9 @@ const PageMenu = () => {
      
   return (
     <div className={styles.body}>
-    
+        <div style={{color:"white",fontSize:'50px'}}>
+        <div>{decodeURI(url.split("?")[1])}</div>
+        </div>
       <div className={styles.list} style={{ height }}>
         <animated.div
           style={{

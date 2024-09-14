@@ -147,7 +147,7 @@ export default function FeaturesBlocks() {
             }}
           >
             {Array.from({ length: 6 }, (_, i) => (
-              <Link href={`/blog/${i + 1}`} key={i}>
+              <Link href={`/solarmenu?${solarTerms[i + 1]}`} key={i}>
                 <div
                   className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6  rounded-full shadow-xl cursor-pointer  transition-all duration-700"
                   style={{
@@ -179,7 +179,7 @@ export default function FeaturesBlocks() {
             }}
           >
             {Array.from({ length: 6 }, (_, i) => (
-              <Link href={`/blog/${i + 1}`} key={i}>
+              <Link href={`/solarmenu?${solarTerms[i + 6]}`} key={i}>
                 <div
                   className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6 rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
                   style={{
@@ -212,7 +212,7 @@ export default function FeaturesBlocks() {
             }}
           >
             {Array.from({ length: 6 }, (_, i) => (
-              <Link href={`/blog/${i + 1}`} key={i}>
+              <Link href={`/solarmenu?${solarTerms[i + 12]}`} key={i}>
                 <div
                   className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6  rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
                   style={{
@@ -245,7 +245,7 @@ export default function FeaturesBlocks() {
             }}
           >
             {Array.from({ length: 6 }, (_, i) => (
-              <Link href={`/blog/${i + 1}`} key={i}>
+              <Link href={`/solarmenu?${solarTerms[i + 18]}`} key={i}>
                 <div
                   className="relative flex-shrink-0 w-40 h-40 flex flex-col items-center p-6  rounded-full shadow-xl cursor-pointer hover:transform hover:scale-150 transition-all duration-700"
                   style={{

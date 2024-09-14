@@ -1,9 +1,9 @@
 /*
  * @Author: ningyongheng ningyongheng@jeejio.com
- * @Date: 2024-09-13 14:01:38
+ * @Date: 2024-09-13 14:01:09
  * @LastEditors: ningyongheng ningyongheng@jeejio.com
- * @LastEditTime: 2024-09-14 14:17:35
- * @FilePath: /tailwind-landing-page-template/app/blog/[season]/page.tsx
+ * @LastEditTime: 2024-09-13 14:03:54
+ * @FilePath: /tailwind-landing-page-template/app/blog/[solar]/page.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import Image from "next/image";
@@ -15,13 +15,13 @@ export async function generateStaticParams() {
   let currentPage = [];
   // 假设你有一些预定义的 id
   for (let i = 1; i <= 100; i++) {
-    currentPage.push({ season: i.toString() });
+    currentPage.push({ solar: i.toString() });
   }
   const posts = currentPage;
 
   // 返回的数组将作为预生成的静态页面路径
   return posts.map((post) => ({
-    season: post.season,
+    solar: post.solar,
   }));
 }
 
@@ -52,16 +52,15 @@ export default function ArticlePage({ params }: any) {
     "小寒",
     "大寒",
   ];
-  const { id } = params;
+  const { solar } = params;
   // TODO：未来这里通过接口查找文章内容，在下面渲染
   // TODO：未来这里通过接口查找文章内容，在下面渲染
   // TODO：未来这里通过接口查找文章内容，在下面渲染
   // TODO：未来这里通过接口查找文章内容，在下面渲染
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">{solarTerms[id - 1]}</h1>
+      <h1 className="text-3xl font-bold mb-4">{solarTerms[solar - 1]}</h1>
       <p className="text-lg mb-6">
-        
         这是一篇文章的内容，这里可以详细介绍文章的主题、观点和故事等。
       </p>
       <Image

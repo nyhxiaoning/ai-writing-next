@@ -1,12 +1,11 @@
 import * as React from 'react'
+
 import { animated, useIsomorphicLayoutEffect, useSpringValue } from '@react-spring/web'
 
+import styles from './styles.module.scss'
+import { useDock } from '../Dock/DockContext'
 import { useMousePosition } from '../hooks/useMousePosition'
 import { useWindowResize } from '../hooks/useWindowResize'
-
-import { useDock } from '../Dock/DockContext'
-
-import styles from './styles.module.scss'
 
 interface DockCardProps {
   children: React.ReactNode
@@ -87,6 +86,7 @@ export const DockCard = ({ children }: DockCardProps) => {
       y.start(-INITIAL_WIDTH / 2, {
         loop: () => {
           if (3 === timesLooped.current++) {
+            // @ts-ignore
             timeoutRef.current = setTimeout(() => {
               opacity.start(0)
               y.set(0)

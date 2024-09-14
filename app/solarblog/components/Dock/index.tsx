@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { animated, useSpringValue } from '@react-spring/web'
-import { clamp } from '@react-spring/shared'
 
-import { useWindowResize } from '../hooks/useWindowResize'
+import { animated, useSpringValue } from '@react-spring/web'
 
 import { DockContext } from './DockContext'
-
+// @ts-ignore
+import { clamp } from '@react-spring/shared'
 import styles from './styles.module.scss'
+import { useWindowResize } from '../hooks/useWindowResize'
 
 interface DockProps {
   children: React.ReactNode

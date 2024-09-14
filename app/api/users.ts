@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export default async function handler(req, res) {
+export default async function handler(req:any, res:any) {
     console.log("hello")
   if (req.method === "GET") {
     // GET 请求，获取所有用户

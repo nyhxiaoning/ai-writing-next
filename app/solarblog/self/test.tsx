@@ -1,93 +1,80 @@
-import * as React from 'react'
+"use client"
 
-import { animated, useScroll, useSpring } from '@react-spring/web'
+import { animated, to as interpolate, useSprings } from '@react-spring/web'
 
-import styles from './index.module.scss'
+import styles from './styles.module.scss'
+import { useDrag } from '@use-gesture/react'
+import { useState } from 'react'
 
-const X_LINES = 40
+const cards = [
+    'https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/RWS_Tarot_02_High_Priestess.jpg/690px-RWS_Tarot_02_High_Priestess.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg',
+]
 
-const PAGE_COUNT = 10
+// These two are just helpers, they curate spring data, values that are later being interpolated into css
+const to = (i: number) => ({
+    x: 0,
+    y: i * -4,
+    scale: 1,
+    rot: -10 + Math.random() * 20,
+    delay: i * 100,
+})
+const from = (_i: number) => ({ x: 0, rot: 0, scale: 1.5, y: -1000 })
+// This is being used down there in the view, it interpolates rotation and scale into a css transform
+const trans = (r: number, s: number) =>
+    `perspective(1500px) rotateX(30deg) rotateY(${r / 10}deg) rotateZ(${r}deg) scale(${s})`
 
-const INITIAL_WIDTH = 20
-
-export default function Test() {
-    const containerRef = React.useRef<HTMLDivElement>(null!)
-    const barContainerRef = React.useRef<HTMLDivElement>(null!)
-
-    const [textStyles, textApi] = useSpring(() => ({
-        y: '100%',
-    }))
-
-    const { scrollYProgress } = useScroll({
-        container: containerRef,
-        onChange: ({ value: { scrollYProgress } }) => {
-            if (scrollYProgress > 0.7) {
-                textApi.start({ y: '0' })
-            } else {
-                textApi.start({ y: '100%' })
+function Deck() {
+    const [gone] = useState(() => new Set()) // The set flags all the cards that are flicked out
+    const [props, api] = useSprings(cards.length, i => ({
+        ...to(i),
+        from: from(i),
+    })) // Create a bunch of springs using the helpers above
+    // Create a gesture, we're interested in down-state, delta (current-pos - click-pos), direction and velocity
+    const bind = useDrag(({ args: [index], active, movement: [mx], direction: [xDir], velocity: [vx] }) => {
+        const trigger = vx > 0.2 // If you flick hard enough it should trigger the card to fly out
+        if (!active && trigger) gone.add(index) // If button/finger's up and trigger velocity is reached, we flag the card ready to fly out
+        api.start(i => {
+            if (index !== i) return // We're only interested in changing spring-data for the current spring
+            const isGone = gone.has(index)
+            const x = isGone ? (200 + window.innerWidth) * xDir : active ? mx : 0 // When a card is gone it flys out left or right, otherwise goes back to zero
+            const rot = mx / 100 + (isGone ? xDir * 10 * vx : 0) // How much the card tilts, flicking it harder makes it rotate faster
+            const scale = active ? 1.1 : 1 // Active cards lift up a bit
+            return {
+                x,
+                rot,
+                scale,
+                delay: undefined,
+                config: { friction: 50, tension: active ? 800 : isGone ? 200 : 500 },
             }
-        },
-        default: {
-            immediate: true,
-        },
+        })
+        if (!active && gone.size === cards.length)
+            setTimeout(() => {
+                gone.clear()
+                api.start(i => to(i))
+            }, 600)
     })
-
+    // Now we're just mapping the animated values to our view, that's it. Btw, this component only renders once. :-)
     return (
-        <div ref={containerRef} className={styles.body}>
-            <div style={{ color: 'white' }}>
-                fadsdfsafdsa dfsa dfsafdsadfs fadsdfsafdsa fadsdfsafdsafdsafdsa fadsdfsafdsa
-                美丽的一天从早晨的早材开始，早晨的食材健康，每一个都是好好吃的内容。
-                不是说不需要一个限制，而是一定有一些内容不需要这些食材。
-            </div>
-            <div className={styles.animated__layers}>
-                <animated.div ref={barContainerRef} className={styles.bar__container}>
-                    {Array.from({ length: X_LINES }).map((_, i) => (
-                        <animated.div
-                            key={i}
-                            className={styles.bar}
-                            style={{
-                                width: scrollYProgress.to(scrollP => {
-                                    const percentilePosition = (i + 1) / X_LINES
-
-                                    return INITIAL_WIDTH / 4 + 40 * Math.cos(((percentilePosition - scrollP) * Math.PI) / 1.5) ** 32
-                                }),
-                            }}
-                        />
-                    ))}
+        <>
+            {props.map(({ x, y, rot, scale }, i) => (
+                <animated.div className={styles.deck} key={i} style={{ x, y }}>
+                    {/* This is the card itself, we're binding our gesture to it (and inject its index so we know which is which) */}
+                    <animated.div
+                        {...bind(i)}
+                        style={{
+                            transform: interpolate([rot, scale], trans),
+                            backgroundImage: `url(${cards[i]})`,
+                        }}
+                    />
                 </animated.div>
-                <animated.div className={styles.bar__container__inverted}>
-                    {Array.from({ length: X_LINES }).map((_, i) => (
-                        <animated.div
-                            key={i}
-                            className={styles.bar}
-                            style={{
-                                width: scrollYProgress.to(scrollP => {
-                                    const percentilePosition = 1 - (i + 1) / X_LINES
-
-                                    return INITIAL_WIDTH / 4 + 40 * Math.cos(((percentilePosition - scrollP) * Math.PI) / 1.5) ** 32
-                                }),
-                            }}
-                        />
-                    ))}
-                </animated.div>
-                <animated.div
-                    className={styles.dot}
-                    style={{
-                        clipPath: scrollYProgress.to(val => `circle(${val * 100}%)`),
-                    }}>
-                    <h1 className={styles.title}>
-                        <span>
-                            <animated.span style={textStyles}>读完了，谢谢你了</animated.span>
-                        </span>
-                        <span>
-                            <animated.span style={textStyles}>好好学习，天天向上!</animated.span>
-                        </span>
-                    </h1>
-                </animated.div>
-            </div>
-            {new Array(PAGE_COUNT).fill(null).map((_, index) => (
-                <div className={styles.full__page} key={index} />
             ))}
-        </div>
+        </>
     )
 }
+
+export default Deck;

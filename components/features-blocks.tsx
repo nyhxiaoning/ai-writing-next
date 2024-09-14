@@ -1,6 +1,7 @@
 "use client";
 
 import { animated, config, to, useSpring } from '@react-spring/web'
+// @ts-ignore
 import { dist, scale } from 'vec-la'
 import { useEffect, useState } from "react";
 

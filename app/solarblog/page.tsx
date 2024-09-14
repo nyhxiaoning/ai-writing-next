@@ -2,7 +2,7 @@
  * @Author: ningyongheng ningyongheng@jeejio.com
  * @Date: 2024-09-13 13:14:40
  * @LastEditors: ningyongheng ningyongheng@jeejio.com
- * @LastEditTime: 2024-09-13 18:23:59
+ * @LastEditTime: 2024-09-14 09:52:48
  * @FilePath: /tailwind-landing-page-template/app/blog/page.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -30,7 +30,6 @@ const GRADIENTS = [
   "https://products.ls.graphics/mesh-gradients/images/09.-Light-Sky-Blue-p-130x130q80.jpeg",
   "https://products.ls.graphics/mesh-gradients/images/12.-Tumbleweed-p-130x130q80.jpeg",
   "https://products.ls.graphics/mesh-gradients/images/15.-Perfume_1-p-130x130q80.jpeg",
-  null,
   "https://products.ls.graphics/mesh-gradients/images/36.-Pale-Chestnut-p-130x130q80.jpeg",
 ];
 

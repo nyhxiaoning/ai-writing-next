@@ -1,6 +1,6 @@
 .fixedbottomcenter {
   position: fixed;
-  bottom: -70;
+  /* bottom: -40; */
   /* 固定在底部 */
   left: 50%;
   /* 将元素的左边界放在页面的水平中心点 */
@@ -10,7 +10,7 @@
   /* 可选：让元素宽度填满 */
   text-align: center;
   /* 水平居中对齐内容 */
-  padding: 20px;
+  padding: 10px;
   /* 可选：设置一些内边距 */
   background-color: #f0f0f0;
   /* 可选：背景色 */
@@ -60,7 +60,7 @@
   min-width: 100px;
   padding: 0 20px;
   margin: 0 auto;
-  height: 260px;
+  /* height: 240px; */
 }
 
 .transitionsItem {
@@ -70,11 +70,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 4em;
+  font-size: 3.5em;
   font-weight: 800;
   text-transform: uppercase;
   will-change: transform, opacity, height;
   white-space: nowrap;
   cursor: pointer;
-  line-height: 80px;
+  line-height: 50px;
+  padding-top: 20px;
 }

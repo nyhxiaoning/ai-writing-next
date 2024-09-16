@@ -4,6 +4,7 @@ import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
 import React, { useEffect, useRef, useState } from "react";
 
 import styles from "./styles.module.scss";
+import { useRouter } from "next/navigation";
 
 interface PageProps {
   offset: number;
@@ -43,6 +44,7 @@ const Page = ({ offset, gradient, onClick }: PageProps) => (
 );
 
 export default function App() {
+  const router = useRouter();
   const parallax = useRef<IParallax>(null);
   const scroll = (to: number) => {
     if (parallax.current) {
@@ -83,10 +85,38 @@ export default function App() {
         pages={4}
         horizontal
       >
-        <Page offset={0} gradient="teal" onClick={() => alert("春")} />
-        <Page offset={1} gradient="pink" onClick={() => alert("夏")} />
-        <Page offset={2} gradient="tomato" onClick={() => alert("秋")} />
-        <Page offset={3} gradient="white" onClick={() => alert("冬")} />
+        <Page
+          offset={0}
+          gradient="teal"
+          onClick={() => {
+            alert("春");
+            router.push("/solar");
+          }}
+        />
+        <Page
+          offset={1}
+          gradient="pink"
+          onClick={() => {
+            alert("夏");
+            router.push("/solar");
+          }}
+        />
+        <Page
+          offset={2}
+          gradient="tomato"
+          onClick={() => {
+            alert("秋");
+            router.push("/solar");
+          }}
+        />
+        <Page
+          offset={3}
+          gradient="white"
+          onClick={() => {
+            alert("冬");
+            router.push("/solar");
+          }}
+        />
       </Parallax>
     </div>
   );

@@ -1,8 +1,8 @@
 /*
  * @Author: ningyongheng ningyongheng@jeejio.com
  * @Date: 2024-09-13 14:01:38
- * @LastEditors: ningyongheng ningyongheng@jeejio.com
- * @LastEditTime: 2024-09-14 14:17:35
+ * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @LastEditTime: 2024-09-16 13:45:52
  * @FilePath: /tailwind-landing-page-template/app/blog/[season]/page.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -61,7 +61,7 @@ export default function ArticlePage({ params }: any) {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">{solarTerms[id - 1]}</h1>
       <p className="text-lg mb-6">
-        
+        季节列表：春天文章汇总：跳到二十四节气
         这是一篇文章的内容，这里可以详细介绍文章的主题、观点和故事等。
       </p>
       <Image

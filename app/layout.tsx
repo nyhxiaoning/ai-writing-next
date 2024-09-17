@@ -42,9 +42,9 @@ export default function RootLayout({
         className={`${inter.variable} font-inter antialiased bg-white text-gray-900 tracking-tight`}
       >
         <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
-          {currentRouter !== "" ? <></> : <Header />}
+          {/* {<Header />} */}
           {children}
-          {currentRouter !== "" ? <></> : <Banner />}
+          {/* {currentRouter !== "" ? <></> : <Banner />} */}
         </div>
       </body>
     </html>

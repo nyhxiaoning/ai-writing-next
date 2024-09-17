@@ -1,6 +1,6 @@
 export default [
-  { css: './homepage/儿时的那些年.jpeg', height: 350 },
-  { css: './homepage/放大的猫.png', height: 400 },
+  { css: './homepage/儿时的那些年.jpeg', height: 300 },
+  { css: './homepage/放大的猫.png', height: 300 },
   { css: './homepage/回到初心.jpeg', height: 350 },
   { css: './homepage/气球和猫.jpeg', height: 350 },
   { css: './homepage/绿色荷叶夏天.jpeg', height: 300 },
@@ -8,9 +8,9 @@ export default [
   { css: './homepage/牧童拉黄牛.jpeg', height: 350 },
   { css: './homepage/夜的梦.jpeg', height: 300 },
   { css: './homepage/一个人的夏日.jpeg', height: 350 },
-  { css: './homepage/远行的准备.jpeg', height: 400 },
-  { css: './homepage/放大的猫.png', height: 400 },
-  { css: './homepage/气球和猫.jpeg', height: 350 },
-  { css: './homepage/绿色荷叶夏天.jpeg', height: 400 },
+  { css: './homepage/远行的准备.jpeg', height: 300 },
+  { css: './homepage/放大的猫.png', height: 300 },
+  { css: './homepage/气球和猫.jpeg', height: 250 },
+  { css: './homepage/绿色荷叶夏天.jpeg', height: 300 },
   { css: './homepage/远行的准备.jpeg', height: 300 },
 ]

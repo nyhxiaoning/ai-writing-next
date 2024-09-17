@@ -9,6 +9,8 @@ import React, {
 } from "react";
 import { a, animated, useTrail, useTransition } from "@react-spring/web";
 
+import Banner from "./banner";
+import Header from "./ui/header";
 import data from "./data";
 import shuffle from "lodash.shuffle";
 import { styled } from "@stitches/react";
@@ -161,21 +163,44 @@ export default function Masonry() {
   });
   // Render the grid
   return (
-    <div
-      ref={ref}
-      className={styles.list}
-      style={{ height: Math.max(...heights) }}
-    >
-      {transitions((style, item) => (
-        <a.div style={style}>
-          <div
-            style={{
-              backgroundImage: `url(${item.css}?auto=compress&dpr=2&h=500&w=500)`,
-            }}
-          />
-        </a.div>
-      ))}
-      {/* <div></div> */}
-    </div>
+    <>
+      {<Header />}
+      <div
+        ref={ref}
+        className={styles.list}
+        style={{ height: Math.max(...heights) }}
+      >
+        {transitions((style, item) => (
+          <a.div style={style}>
+            <div
+              style={{
+                backgroundImage: `url(${item.css}?auto=compress&dpr=2&h=500&w=500)`,
+              }}
+            />
+          </a.div>
+        ))}
+        {/* <div></div> */}
+      </div>
+
+      <nav className="flex sm:justify-center space-x-16 py-3">
+        {[
+          ["音乐", "/music"],
+          ["诗词", "/team"],
+          ["随笔", "/solar"],
+          ["散文", "/seasonmenu"],
+          ["读书笔记", "/reports2"],
+          ["小说", "/reports3"],
+          ["其他", "/reports4"],
+        ].map(([title, url]) => (
+          <a
+            href={url}
+            className="text-yellow-700 rounded-lg px-3 py-2  font-medium hover:bg-slate-100 hover:text-slate-950"
+          >
+            {title}
+          </a>
+        ))}
+      </nav>
+      <Banner />
+    </>
   );
 }

@@ -89,32 +89,28 @@ export default function App() {
           offset={0}
           gradient="teal"
           onClick={() => {
-            alert("春");
-            router.push("/solar");
+            router.push("/seasontransfer?0");
           }}
         />
         <Page
           offset={1}
           gradient="pink"
           onClick={() => {
-            alert("夏");
-            router.push("/solar");
+            router.push("/seasontransfer?6");
           }}
         />
         <Page
           offset={2}
           gradient="tomato"
           onClick={() => {
-            alert("秋");
-            router.push("/solar");
+            router.push("/seasontransfer?12");
           }}
         />
         <Page
           offset={3}
           gradient="white"
           onClick={() => {
-            alert("冬");
-            router.push("/solar");
+            router.push("/seasontransfer?18");
           }}
         />
       </Parallax>

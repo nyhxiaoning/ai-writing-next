@@ -185,12 +185,12 @@ export default function Masonry() {
       <nav className="flex sm:justify-center space-x-16 py-3">
         {[
           ["音乐", "/music"],
-          ["诗词", "/team"],
+          ["诗词", "/poetry"],
           ["随笔", "/solar"],
           ["散文", "/seasonmenu"],
-          ["读书笔记", "/reports2"],
-          ["小说", "/reports3"],
-          ["其他", "/reports4"],
+          ["读书笔记", "/readingnote"],
+          ["小说", "/novel"],
+          ["其他", "/others"],
         ].map(([title, url]) => (
           <a
             href={url}

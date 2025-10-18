@@ -9,20 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@bytemd/plugin-breaks": "^1.21.0",
-    "@bytemd/plugin-frontmatter": "^1.21.0",
-    "@bytemd/plugin-gemoji": "^1.21.0",
-    "@bytemd/plugin-gfm": "^1.21.0",
-    "@bytemd/plugin-highlight": "^1.21.0",
-    "@bytemd/plugin-math": "^1.21.0",
-    "@bytemd/plugin-medium-zoom": "^1.21.0",
-    "@bytemd/plugin-mermaid": "^1.21.0",
-    "@bytemd/react": "^1.21.0",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.1.5",
     "@prisma/client": "^5.19.1",
-    "@react-spring/parallax": "^9.7.4",
-    "@react-spring/web": "^9.7.4",
     "@stitches/react": "^1.2.8",
     "@types/lodash.shuffle": "^4.2.9",
     "@types/node": "^20.10.4",
@@ -30,6 +19,7 @@
     "@types/react-dom": "^18.2.17",
     "@use-gesture/react": "^10.3.1",
     "add": "^2.0.6",
+    "ahooks": "^3.7.8",
     "aos": "^3.0.0-beta.6",
     "lodash.shuffle": "^4.2.0",
     "mysql2": "^3.11.2",
@@ -37,11 +27,8 @@
     "prisma": "^5.19.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-use-measure": "^2.1.1",
     "sass": "^1.78.0",
-    "solid": "link:@heroicons/react/20/solid",
-    "typescript": "^5.3.3",
-    "vec-la": "^1.5.0"
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",

@@ -26,6 +26,7 @@ export default function LanguageSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLanguageChange = (newLocale: Locale) => {
+    console.log("获取的当前的语言=>", newLocale);
     startTransition(() => {
       // 获取当前路径，移除语言前缀
       let pathWithoutLocale = pathname;
@@ -44,7 +45,9 @@ export default function LanguageSwitcher() {
       let newPath;
       if (newLocale === "zh") {
         // 中文是默认语言，不需要前缀
-        newPath = pathWithoutLocale === "/" ? "/" : pathWithoutLocale;
+        newPath = `/${newLocale}${
+          pathWithoutLocale === "/" ? "" : pathWithoutLocale
+        }`;
       } else {
         // 其他语言需要前缀
         newPath = `/${newLocale}${

@@ -1,39 +1,49 @@
-import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
-export default async function handler(req:any, res:any) {
-    console.log("hello")
-  if (req.method === "GET") {
-    // GET 请求，获取所有用户
-    try {
-      const users = await prisma.user.findMany();
-      console.log(users,'users');
-      res.status(200).json(users);
-    } catch (error) {
-      res.status(500).json({ error: "Error fetching users" });
-    }
-  } else if (req.method === "POST") {
-    // POST 请求，创建新用户
-    const { name, email } = req.body;
+// GET 请求，获取所有用户
+export async function GET() {
+  try {
+    console.log("Getting users...");
+    const users = await prisma.user.findMany();
+    console.log(users, 'users');
+    return NextResponse.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return NextResponse.json(
+      { error: "Error fetching users" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST 请求，创建新用户
+export async function POST(request: NextRequest) {
+  try {
+    const { name, email } = await request.json();
+
     if (!name || !email) {
-      return res.status(400).json({ error: "Name and email are required" });
+      return NextResponse.json(
+        { error: "Name and email are required" },
+        { status: 400 }
+      );
     }
-    try {
-      const user = await prisma.user.create({
-        data: {
-          name,
-          email,
-        },
-      });
-      console.log(user, "user");
 
-      res.status(201).json(user);
-    } catch (error) {
-      res.status(500).json({ error: "Error creating user" });
-    }
-  } else {
-    // 处理不支持的请求方法
-    res.status(405).json({ error: "Method not allowed" });
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+      },
+    });
+
+    console.log(user, "user created");
+    return NextResponse.json(user, { status: 201 });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    return NextResponse.json(
+      { error: "Error creating user" },
+      { status: 500 }
+    );
   }
 }

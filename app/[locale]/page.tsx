@@ -1,5 +1,5 @@
 // import Banner from "@/components/banner";
-import DebugInfo from "@/components/DebugInfo";
+// import DebugInfo from "@/components/DebugInfo";
 import Footer from "@/components/ui/footer";
 import Header from "@/components/ui/header";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -124,7 +124,7 @@ export default function HomePage({ params: { locale } }: Props) {
         </section>
       </main>
       <Footer />
-      <DebugInfo />
+      {/* <DebugInfo /> */}
     </>
   );
 }

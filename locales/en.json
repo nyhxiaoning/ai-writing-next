@@ -1,0 +1,50 @@
+{
+    "Common": {
+        "home": "Home",
+        "about": "About",
+        "contact": "Contact",
+        "email": "Email",
+        "language": "Language",
+        "welcome": "Welcome",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "save": "Save",
+        "edit": "Edit",
+        "delete": "Delete",
+        "search": "Search",
+        "submit": "Submit"
+    },
+    "Navigation": {
+        "dashboard": "Dashboard",
+        "profile": "Profile",
+        "settings": "Settings",
+        "logout": "Logout"
+    },
+    "HomePage": {
+        "title": "Welcome to Our Website",
+        "subtitle": "11A modern website built with Next.js 14 and internationalization",
+        "description": "Experience multi-language support and responsive design",
+        "getStarted": "Get Started",
+        "learnMore": "Learn More"
+    },
+    "Auth": {
+        "signin": "Sign In",
+        "signup": "Sign Up",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "forgotPassword": "Forgot Password?",
+        "rememberMe": "Remember Me",
+        "alreadyHaveAccount": "Already have an account?",
+        "dontHaveAccount": "Don't have an account?"
+    },
+    "Footer": {
+        "copyright": "Copyright",
+        "allRightsReserved": "All rights reserved",
+        "privacyPolicy": "Privacy Policy",
+        "termsOfService": "Terms of Service"
+    }
+}

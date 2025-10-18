@@ -1,0 +1,116 @@
+import { useTranslations } from 'next-intl';
+import { unstable_setRequestLocale } from 'next-intl/server';
+import Header from '@/components/ui/header';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+
+type Props = {
+  params: { locale: string };
+};
+
+export default function AboutPage({ params: { locale } }: Props) {
+  unstable_setRequestLocale(locale);
+  
+  const t = useTranslations('HomePage');
+  const tCommon = useTranslations('Common');
+
+  return (
+    <>
+      <Header />
+      <main className="flex-grow">
+        {/* 语言切换器 */}
+        <div className="fixed top-4 right-4 z-50">
+          <LanguageSwitcher />
+        </div>
+        
+        <section className="relative">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="pt-32 pb-12 md:pt-40 md:pb-20">
+              <div className="text-center pb-12 md:pb-16">
+                <h1 className="text-4xl md:text-5xl font-extrabold leading-tighter tracking-tighter mb-4">
+                  {tCommon('about')}
+                </h1>
+                <div className="max-w-3xl mx-auto">
+                  <p className="text-xl text-gray-600 mb-8">
+                    了解我们的团队和使命
+                  </p>
+                </div>
+              </div>
+
+              {/* 内容区域 */}
+              <div className="max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                  <div>
+                    <h2 className="text-3xl font-bold mb-6">我们的故事</h2>
+                    <p className="text-gray-600 mb-4">
+                      我们致力于创建现代化、高性能的 Web 应用程序。通过使用最新的技术栈，
+                      我们为用户提供卓越的体验。
+                    </p>
+                    <p className="text-gray-600 mb-4">
+                      这个项目展示了 Next.js 14 与国际化功能的完美结合，
+                      支持多语言切换和响应式设计。
+                    </p>
+                    <p className="text-gray-600">
+                      我们相信技术应该服务于人，让每个用户都能享受到
+                      无障碍的数字体验。
+                    </p>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-6">
+                      <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">持续学习</h3>
+                    <p className="text-gray-600">
+                      我们始终保持对新技术的好奇心，
+                      不断学习和改进我们的技能。
+                    </p>
+                  </div>
+                </div>
+
+                {/* 技术栈展示 */}
+                <div className="mt-16">
+                  <h2 className="text-3xl font-bold text-center mb-12">技术栈</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-black rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <span className="text-white font-bold text-xl">N</span>
+                      </div>
+                      <h4 className="font-semibold">Next.js 14</h4>
+                      <p className="text-sm text-gray-600">React 框架</p>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <span className="text-white font-bold text-xl">TS</span>
+                      </div>
+                      <h4 className="font-semibold">TypeScript</h4>
+                      <p className="text-sm text-gray-600">类型安全</p>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-cyan-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <span className="text-white font-bold text-xl">TW</span>
+                      </div>
+                      <h4 className="font-semibold">Tailwind CSS</h4>
+                      <p className="text-sm text-gray-600">样式框架</p>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <span className="text-white font-bold text-xl">i18n</span>
+                      </div>
+                      <h4 className="font-semibold">next-intl</h4>
+                      <p className="text-sm text-gray-600">国际化</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </>
+  );
+}

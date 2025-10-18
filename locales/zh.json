@@ -1,0 +1,50 @@
+{
+    "Common": {
+        "home": "首页",
+        "about": "关于",
+        "contact": "联系我们",
+        "language": "语言",
+        "email": "邮箱",
+        "welcome": "欢迎",
+        "loading": "加载中...",
+        "error": "错误",
+        "success": "成功",
+        "cancel": "取消",
+        "confirm": "确认",
+        "save": "保存",
+        "edit": "编辑",
+        "delete": "删除",
+        "search": "搜索",
+        "submit": "提交"
+    },
+    "Navigation": {
+        "dashboard": "控制台",
+        "profile": "个人资料",
+        "settings": "设置",
+        "logout": "退出登录"
+    },
+    "HomePage": {
+        "title": "欢迎来到我们的网站",
+        "subtitle": "这是一个使用 Next.js 14 和国际化的现代网站",
+        "description": "体验多语言支持和响应式设计",
+        "getStarted": "开始使用",
+        "learnMore": "了解更多"
+    },
+    "Auth": {
+        "signin": "登录",
+        "signup": "注册",
+        "email": "邮箱",
+        "password": "密码",
+        "confirmPassword": "确认密码",
+        "forgotPassword": "忘记密码？",
+        "rememberMe": "记住我",
+        "alreadyHaveAccount": "已有账户？",
+        "dontHaveAccount": "没有账户？"
+    },
+    "Footer": {
+        "copyright": "版权所有",
+        "allRightsReserved": "保留所有权利",
+        "privacyPolicy": "隐私政策",
+        "termsOfService": "服务条款"
+    }
+}

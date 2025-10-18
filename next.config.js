@@ -1,30 +1,17 @@
+const withNextIntl = require('next-intl/plugin')(
+  // 指定 i18n 配置文件路径
+  './i18n.ts'
+);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'export',
+    // 注释掉 output: 'export' 因为国际化需要服务端渲染
+    // output: 'export',
     images: {
         unoptimized: true,
     },
-    // 启用 Pages Router 和 App Router 并行支持
-    experimental: {
-        // 允许 Pages Router 和 App Router 共存
-        appDir: true,
-    },
-    // 确保静态导出时包含 Pages Router 页面
-    trailingSlash: true,
-    // 配置重写规则，确保路由正确处理
-    async rewrites() {
-        return [
-            // Pages Router 路由优先级配置
-            {
-                source: '/pages-demo',
-                destination: '/pages-demo',
-            },
-            {
-                source: '/api/:path*',
-                destination: '/api/:path*',
-            },
-        ]
-    },
+    // 移除 trailingSlash，可能与国际化路由冲突
+    // trailingSlash: true,
 }
 
-module.exports = nextConfig
+module.exports = withNextIntl(nextConfig);

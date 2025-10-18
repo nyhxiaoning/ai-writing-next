@@ -4,13 +4,17 @@ import { a, animated, useTrail, useTransition } from "@react-spring/web";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import Dropdown from "@/components/utils/dropdown";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Link from "next/link";
 import Logo from "./logo";
 import MobileMenu from "./mobile-menu";
 import { styled } from "@stitches/react";
 import styles from "./index.module.css";
+import { useTranslations } from "next-intl";
 
 export default function Header() {
+  const t = useTranslations("HomePage");
+  const tCommon = useTranslations("Common");
   const [top, setTop] = useState<boolean>(true);
 
   // detect whether user has scrolled the page down by 10px
@@ -45,19 +49,19 @@ export default function Header() {
     reftwo.current = [];
     settwo([]);
     reftwo.current.push(
-      setTimeout(() => settwo(["欢迎来到文字世界", "文字塑造时间"]), 2000)
+      setTimeout(() => settwo([t("title"), t("subtitle")]), 2000)
     );
     reftwo.current.push(
-      setTimeout(() => settwo(["欢迎来到文字世界", "文字塑造时间"]), 5000)
+      setTimeout(() => settwo([t("title"), t("subtitle")]), 5000)
     );
     reftwo.current.push(
-      setTimeout(() => settwo(["欢迎来到文字世界", "文字塑造时间"]), 8000)
+      setTimeout(() => settwo([t("title"), t("subtitle")]), 8000)
     );
-  }, []);
+  }, [t]);
 
   useEffect(() => {
-    reset();
-    return () => reftwo.current.forEach(clearTimeout);
+    // reset();
+    // return () => reftwo.current.forEach(clearTimeout);
   }, []);
   useEffect(() => {
     scrollHandler();
@@ -71,6 +75,50 @@ export default function Header() {
         !top ? "bg-white backdrop-blur-sm shadow-lg" : ""
       }`}
     >
+      {/* 导航栏 */}
+      <div className="max-w-6xl mx-auto px-5 sm:px-6">
+        <div className="flex items-center justify-between h-16 md:h-20">
+          {/* 网站 Logo */}
+          <div className="shrink-0 mr-4">
+            <Logo />
+          </div>
+
+          {/* 桌面导航 */}
+          <nav className="hidden md:flex md:grow">
+            <ul className="flex grow justify-end flex-wrap items-center">
+              <li>
+                <Link
+                  href="/"
+                  className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
+                >
+                  {tCommon("home")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
+                >
+                  {tCommon("about")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
+                >
+                  {tCommon("contact")}
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
+          {/* 移动端菜单 */}
+          <MobileMenu />
+        </div>
+      </div>
+
+      {/* 动画文字展示 */}
       <div className={styles.fixedbottomcenter}>
         <div className={styles.main}>
           {transitionstwo(({ innerHeight, ...rest }, item) => (

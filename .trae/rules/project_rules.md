@@ -1,6 +1,6 @@
 # 🚀 Next.js 14 前端工程标准 Prompt 模板
 
-（App Router + Pages Router + shadcn/ui + TailwindCSS + i18n）
+（App Router + shadcn/ui + TailwindCSS + i18n）
 
 ---
 

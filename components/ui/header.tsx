@@ -119,6 +119,14 @@ export default function Header() {
               </li>
               <li>
                 <Link
+                  href={`/${currentLocale}/components-demo`}
+                  className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
+                >
+                  组件演示
+                </Link>
+              </li>
+              <li>
+                <Link
                   href={`/${currentLocale}/contact`}
                   className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
                 >

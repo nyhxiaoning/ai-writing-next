@@ -119,6 +119,15 @@ export default function MobileMenu() {
                 {tCommon('contact')}
               </Link>
             </li>
+            <li>
+              <Link 
+                href={`/${currentLocale}/components-demo`} 
+                className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" 
+                onClick={() => setMobileNavOpen(false)}
+              >
+                组件演示
+              </Link>
+            </li>
             
             {/* 语言切换器 */}
             <li className="py-2 flex justify-center">

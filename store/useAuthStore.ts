@@ -19,9 +19,13 @@ interface AuthState {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    login: (email: string, password: string) => Promise<boolean>;
-    logout: () => void;
-    setUser: (user: User) => void;
+    login: (email: string, password: string, rememberMe?: boolean) => Promise<boolean>;
+    logout: () => Promise<void>;
+    register: (name: string, email: string, password: string, confirmPassword: string, locale?: string) => Promise<{ success: boolean; error?: string }>;
+    requestPasswordReset: (email: string, locale?: string) => Promise<{ success: boolean; error?: string }>;
+    confirmPasswordReset: (token: string, password: string, confirmPassword: string) => Promise<{ success: boolean; error?: string }>;
+    checkAuth: () => Promise<void>;
+    setUser: (user: User | null) => void;
     setLoading: (loading: boolean) => void;
 }
 
@@ -40,22 +44,29 @@ export const useAuthStore = create<AuthState>()(
              * 登录方法
              * @param email 邮箱
              * @param password 密码
+             * @param rememberMe 记住我
              * @returns Promise<boolean> 登录是否成功
              */
-            login: async (email: string, password: string) => {
+            login: async (email: string, password: string, rememberMe: boolean = false) => {
                 set({ isLoading: true });
 
                 try {
-                    // 模拟 API 调用延迟
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    const response = await fetch('/api/auth/signin', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password, rememberMe }),
+                    });
 
-                    // 模拟登录验证（演示用）
-                    if (email === 'admin@example.com' && password === '123456') {
+                    const data = await response.json();
+
+                    if (response.ok) {
                         const user: User = {
-                            id: '1',
-                            email: email,
-                            name: '演示用户',
-                            avatar: '/images/avatar.jpg'
+                            id: data.user.id.toString(),
+                            email: data.user.email,
+                            name: data.user.name,
+                            avatar: data.user.avatar || '/images/avatar.jpg'
                         };
 
                         set({
@@ -64,14 +75,10 @@ export const useAuthStore = create<AuthState>()(
                             isLoading: false
                         });
 
-                        // 设置认证 cookie（用于服务端验证）
-                        if (typeof window !== 'undefined') {
-                            document.cookie = `auth-token=demo-token; path=/; max-age=86400`;
-                        }
-
                         return true;
                     } else {
                         set({ isLoading: false });
+                        console.error('登录失败:', data.error);
                         return false;
                     }
                 } catch (error) {
@@ -84,17 +91,20 @@ export const useAuthStore = create<AuthState>()(
             /**
              * 登出方法
              */
-            logout: () => {
+            logout: async () => {
+                try {
+                    await fetch('/api/auth/signout', {
+                        method: 'POST',
+                    });
+                } catch (error) {
+                    console.error('登出API调用失败:', error);
+                }
+
                 set({
                     user: null,
                     isAuthenticated: false,
                     isLoading: false
                 });
-
-                // 清除认证 cookie
-                if (typeof window !== 'undefined') {
-                    document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-                }
             },
 
             /**
@@ -111,6 +121,163 @@ export const useAuthStore = create<AuthState>()(
              */
             setLoading: (loading: boolean) => {
                 set({ isLoading: loading });
+            },
+
+            /**
+             * 注册方法
+             * @param name 姓名
+             * @param email 邮箱
+             * @param password 密码
+             * @param confirmPassword 确认密码
+             * @param locale 语言
+             * @returns Promise<{success: boolean, error?: string}>
+             */
+            register: async (name: string, email: string, password: string, confirmPassword: string, locale: string = 'zh') => {
+                set({ isLoading: true });
+
+                try {
+                    const response = await fetch('/api/auth/signup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ name, email, password, confirmPassword, locale }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        const user: User = {
+                            id: data.user.id.toString(),
+                            email: data.user.email,
+                            name: data.user.name,
+                            avatar: data.user.avatar || '/images/avatar.jpg'
+                        };
+
+                        set({
+                            user,
+                            isAuthenticated: true,
+                            isLoading: false
+                        });
+
+                        return { success: true };
+                    } else {
+                        set({ isLoading: false });
+                        return { success: false, error: data.error };
+                    }
+                } catch (error) {
+                    console.error('注册错误:', error);
+                    set({ isLoading: false });
+                    return { success: false, error: '网络错误，请稍后重试' };
+                }
+            },
+
+            /**
+             * 请求重置密码
+             * @param email 邮箱
+             * @param locale 语言
+             * @returns Promise<{success: boolean, error?: string}>
+             */
+            requestPasswordReset: async (email: string, locale: string = 'zh') => {
+                set({ isLoading: true });
+
+                try {
+                    const response = await fetch('/api/auth/reset-password', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, locale }),
+                    });
+
+                    const data = await response.json();
+                    set({ isLoading: false });
+
+                    if (response.ok) {
+                        return { success: true };
+                    } else {
+                        return { success: false, error: data.error };
+                    }
+                } catch (error) {
+                    console.error('请求重置密码错误:', error);
+                    set({ isLoading: false });
+                    return { success: false, error: '网络错误，请稍后重试' };
+                }
+            },
+
+            /**
+             * 确认重置密码
+             * @param token 重置令牌
+             * @param password 新密码
+             * @param confirmPassword 确认密码
+             * @returns Promise<{success: boolean, error?: string}>
+             */
+            confirmPasswordReset: async (token: string, password: string, confirmPassword: string) => {
+                set({ isLoading: true });
+
+                try {
+                    const response = await fetch('/api/auth/reset-password/confirm', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ token, password, confirmPassword }),
+                    });
+
+                    const data = await response.json();
+                    set({ isLoading: false });
+
+                    if (response.ok) {
+                        return { success: true };
+                    } else {
+                        return { success: false, error: data.error };
+                    }
+                } catch (error) {
+                    console.error('确认重置密码错误:', error);
+                    set({ isLoading: false });
+                    return { success: false, error: '网络错误，请稍后重试' };
+                }
+            },
+
+            /**
+             * 检查认证状态
+             */
+            checkAuth: async () => {
+                try {
+                    const response = await fetch('/api/auth/me', {
+                        method: 'GET',
+                        credentials: 'include',
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const user: User = {
+                            id: data.user.id.toString(),
+                            email: data.user.email,
+                            name: data.user.name,
+                            avatar: data.user.avatar || '/images/avatar.jpg'
+                        };
+
+                        set({
+                            user,
+                            isAuthenticated: true,
+                            isLoading: false
+                        });
+                    } else {
+                        set({
+                            user: null,
+                            isAuthenticated: false,
+                            isLoading: false
+                        });
+                    }
+                } catch (error) {
+                    console.error('检查认证状态错误:', error);
+                    set({
+                        user: null,
+                        isAuthenticated: false,
+                        isLoading: false
+                    });
+                }
             }
         }),
         {

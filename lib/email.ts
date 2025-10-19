@@ -1,20 +1,38 @@
 import nodemailer from 'nodemailer';
 
+// 检查邮件配置是否完整
+const isEmailConfigured = () => {
+  return !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+};
+
 // 邮件配置
-const transporter = nodemailer.createTransporter({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+let transporter: nodemailer.Transporter | null = null;
+
+if (isEmailConfigured()) {
+  transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+} else {
+  console.warn('⚠️ 邮件配置不完整，邮件功能将被禁用');
+}
 
 /**
  * 发送重置密码邮件
  */
 export async function sendResetPasswordEmail(email: string, resetToken: string, locale: string = 'zh') {
+  // 如果邮件未配置，直接返回成功（开发环境下）
+  if (!transporter) {
+    console.log('📧 邮件未配置，跳过发送重置密码邮件到:', email);
+    console.log('🔗 重置链接:', `${process.env.NEXT_PUBLIC_APP_URL}/${locale}/auth/reset-password?token=${resetToken}`);
+    return true;
+  }
+
   const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/${locale}/auth/reset-password?token=${resetToken}`;
   
   const emailContent = {
@@ -70,6 +88,12 @@ export async function sendResetPasswordEmail(email: string, resetToken: string, 
  * 发送欢迎邮件
  */
 export async function sendWelcomeEmail(email: string, name: string, locale: string = 'zh') {
+  // 如果邮件未配置，直接返回成功（开发环境下）
+  if (!transporter) {
+    console.log('📧 邮件未配置，跳过发送欢迎邮件到:', email, '用户:', name);
+    return true;
+  }
+
   const emailContent = {
     zh: {
       subject: '欢迎注册',

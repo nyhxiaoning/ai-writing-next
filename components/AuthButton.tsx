@@ -2,7 +2,7 @@
 
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 
 /**
@@ -16,11 +16,19 @@ interface AuthButtonProps {
  * 认证按钮组件
  */
 const AuthButton: React.FC<AuthButtonProps> = ({ className = '' }) => {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, checkAuth, isLoading } = useAuthStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations('Auth');
+
+  /**
+   * Effects
+   */
+  useEffect(() => {
+    // 组件挂载时检查认证状态
+    checkAuth();
+  }, [checkAuth]);
 
   // 获取当前语言
   const getCurrentLocale = () => {
@@ -53,6 +61,15 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '' }) => {
   /**
    * JSXComponents
    */
+  // 加载状态
+  if (isLoading) {
+    return (
+      <div className={`bg-gray-200 animate-pulse px-4 py-2 rounded-lg ${className}`}>
+        <div className="w-16 h-6 bg-gray-300 rounded"></div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <button

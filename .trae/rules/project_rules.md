@@ -30,7 +30,7 @@
 
 | 分类     | 技术                                         |
 | -------- | -------------------------------------------- |
-| 核心框架 | Next.js 15（App Router + Pages Router 并行） |
+| 核心框架 | Next.js 14（App Router + Pages Router 并行） |
 | 编程语言 | TypeScript 5                                 |
 | 样式体系 | TailwindCSS + shadcn/ui + Radix UI           |
 | 状态管理 | Zustand + React Query                        |

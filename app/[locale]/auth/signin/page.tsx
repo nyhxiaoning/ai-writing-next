@@ -1,0 +1,208 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+import Link from "next/link";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+/**
+ * Types
+ */
+interface FormData {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
+/**
+ * 登录页面
+ */
+export default function SignIn() {
+  const { login, isLoading, isAuthenticated } = useAuthStore();
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    password: "",
+    rememberMe: false,
+  });
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const t = useTranslations("Auth");
+
+  /**
+   * Effects
+   */
+  useEffect(() => {
+    // 如果已经登录，重定向到首页
+    if (isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, router]);
+
+  /**
+   * Events
+   */
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+    // 清除错误信息
+    if (error) setError("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    console.log("发送内容");
+    e.preventDefault();
+    setError("");
+
+    if (!formData.email || !formData.password) {
+      setError("请填写所有必填字段");
+      return;
+    }
+
+    const success = await login(formData.email, formData.password);
+
+    if (success) {
+      router.push("/dashboard");
+    } else {
+      setError("邮箱或密码错误");
+    }
+  };
+
+  /**
+   * JSXComponents
+   */
+  return (
+    <section className="bg-gradient-to-b from-gray-100 to-white min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="pt-32 pb-12 md:pt-40 md:pb-20">
+          {/* Page header */}
+          <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              {t("signin")}
+            </h1>
+            <p className="text-xl text-gray-600">欢迎回来，请登录您的账户</p>
+          </div>
+
+          {/* Form */}
+          <div className="max-w-sm mx-auto">
+            <form onSubmit={handleSubmit}>
+              {/* 错误提示 */}
+              {error && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                  {error}
+                </div>
+              )}
+
+              {/* 演示账户提示 */}
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 className="text-sm font-medium text-blue-800 mb-2">
+                  演示账户
+                </h3>
+                <p className="text-sm text-blue-600">
+                  邮箱: admin@example.com
+                  <br />
+                  密码: 123456
+                </p>
+              </div>
+
+              <div className="flex flex-wrap -mx-3 mb-4">
+                <div className="w-full px-3">
+                  <label
+                    className="block text-gray-800 text-sm font-medium mb-1"
+                    htmlFor="email"
+                  >
+                    {t("email")}
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="form-input w-full text-gray-800 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                    placeholder="请输入您的邮箱地址"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap -mx-3 mb-4">
+                <div className="w-full px-3">
+                  <div className="flex justify-between">
+                    <label
+                      className="block text-gray-800 text-sm font-medium mb-1"
+                      htmlFor="password"
+                    >
+                      {t("password")}
+                    </label>
+                    <Link
+                      href="/auth/reset-password"
+                      className="text-sm font-medium text-blue-600 hover:underline"
+                    >
+                      {t("forgotPassword")}
+                    </Link>
+                  </div>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="form-input w-full text-gray-800 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                    placeholder="请输入您的密码"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap -mx-3 mb-4">
+                <div className="w-full px-3">
+                  <div className="flex justify-between">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="rememberMe"
+                        checked={formData.rememberMe}
+                        onChange={handleInputChange}
+                        className="form-checkbox"
+                      />
+                      <span className="text-gray-600 ml-2">
+                        {t("rememberMe")}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap -mx-3 mt-6">
+                <div className="w-full px-3">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="btn text-white bg-blue-600 hover:bg-blue-700 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? "登录中..." : t("signin")}
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <div className="text-gray-600 text-center mt-6">
+              还没有账户？{" "}
+              <Link
+                href="/auth/signup"
+                className="text-blue-600 hover:underline transition duration-150 ease-in-out"
+              >
+                立即注册
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

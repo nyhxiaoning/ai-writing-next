@@ -2,10 +2,28 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Transition } from '@headlessui/react'
+import { useAuthStore } from '@/store/useAuthStore'
+import { useTranslations } from 'next-intl'
+import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 export default function MobileMenu() {
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false)
+  const { user, isAuthenticated, logout } = useAuthStore()
+  const router = useRouter()
+  const pathname = usePathname()
+  const t = useTranslations('Auth')
+  const tCommon = useTranslations('Common')
+
+  // 获取当前语言
+  const getCurrentLocale = () => {
+    const segments = pathname.split('/');
+    const locale = segments[1];
+    return ['zh', 'en', 'ja'].includes(locale) ? locale : 'zh';
+  };
+
+  const currentLocale = getCurrentLocale();
 
   const trigger = useRef<HTMLButtonElement>(null)
   const mobileNav = useRef<HTMLDivElement>(null)
@@ -30,6 +48,15 @@ export default function MobileMenu() {
     document.addEventListener('keydown', keyHandler)
     return () => document.removeEventListener('keydown', keyHandler)
   })
+
+  /**
+   * Events
+   */
+  const handleLogout = () => {
+    logout()
+    setMobileNavOpen(false)
+    router.push(`/${currentLocale}`)
+  }
 
   return (
     <div className="flex md:hidden">
@@ -64,17 +91,98 @@ export default function MobileMenu() {
           leaveTo="opacity-0"
         >
           <ul className="px-5 py-2">
+            {/* 导航链接 */}
             <li>
-              <Link href="/signin" className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" onClick={() => setMobileNavOpen(false)}>Sign in</Link>
-            </li>
-            <li>
-              <Link href="/signup" className="btn-sm text-gray-200 bg-gray-900 hover:bg-gray-800 w-full my-2" onClick={() => setMobileNavOpen(false)}>
-                <span>Sign up</span>
-                <svg className="w-3 h-3 fill-current text-gray-400 shrink-0 ml-2 -mr-1" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M11.707 5.293L7 .586 5.586 2l3 3H0v2h8.586l-3 3L7 11.414l4.707-4.707a1 1 0 000-1.414z" fill="#999" fillRule="nonzero" />
-                </svg>
+              <Link 
+                href={`/${currentLocale}`} 
+                className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" 
+                onClick={() => setMobileNavOpen(false)}
+              >
+                {tCommon('home')}
               </Link>
             </li>
+            <li>
+              <Link 
+                href={`/${currentLocale}/about`} 
+                className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" 
+                onClick={() => setMobileNavOpen(false)}
+              >
+                {tCommon('about')}
+              </Link>
+            </li>
+            <li>
+              <Link 
+                href={`/${currentLocale}/contact`} 
+                className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" 
+                onClick={() => setMobileNavOpen(false)}
+              >
+                {tCommon('contact')}
+              </Link>
+            </li>
+            
+            {/* 语言切换器 */}
+            <li className="py-2 flex justify-center">
+              <LanguageSwitcher />
+            </li>
+            
+            {/* 认证相关 */}
+            {isAuthenticated ? (
+              <>
+                <li className="border-t border-gray-200 pt-4 mt-4">
+                  <div className="flex items-center justify-center py-2">
+                    {user?.avatar && (
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="w-8 h-8 rounded-full mr-2"
+                      />
+                    )}
+                    <span className="text-gray-700 font-medium">{user?.name}</span>
+                  </div>
+                </li>
+                <li>
+                  <Link 
+                    href={`/${currentLocale}/dashboard`} 
+                    className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" 
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    {t('dashboard')}
+                  </Link>
+                </li>
+                <li>
+                  <button 
+                    onClick={handleLogout}
+                    className="flex font-medium w-full text-red-600 hover:text-red-800 py-2 justify-center"
+                  >
+                    {t('logout')}
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="border-t border-gray-200 pt-4 mt-4">
+                  <Link 
+                    href={`/${currentLocale}/auth/signin`} 
+                    className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" 
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    {t('signin')}
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href={`/${currentLocale}/auth/signup`} 
+                    className="btn-sm text-gray-200 bg-gray-900 hover:bg-gray-800 w-full my-2 flex items-center justify-center" 
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    <span>{t('signup')}</span>
+                    <svg className="w-3 h-3 fill-current text-gray-400 shrink-0 ml-2 -mr-1" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11.707 5.293L7 .586 5.586 2l3 3H0v2h8.586l-3 3L7 11.414l4.707-4.707a1 1 0 000-1.414z" fill="#999" fillRule="nonzero" />
+                    </svg>
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>          
         </Transition>
       </div>

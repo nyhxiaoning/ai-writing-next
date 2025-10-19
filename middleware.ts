@@ -1,19 +1,26 @@
 import { defaultLocale, locales } from './i18n';
-
 import createMiddleware from 'next-intl/middleware';
+import { NextRequest, NextResponse } from 'next/server';
 
-export default createMiddleware({
+// 需要认证的路径
+const protectedPaths = ['/dashboard'];
+
+// 认证相关路径
+const authPaths = ['/auth/signin', '/auth/signup', '/auth/reset-password'];
+
+// 创建国际化中间件
+const intlMiddleware = createMiddleware({
     // 支持的语言列表
     locales,
 
     // 默认语言
     defaultLocale,
 
-    // 语言检测策略 - 启用自动检测
-    localeDetection: true,
+    // 语言检测策略 - 禁用自动检测，使用默认语言
+    localeDetection: false,
 
-    // 路径前缀策略 - 默认语言不显示前缀，其他语言显示前缀
-    localePrefix: 'as-needed',
+    // 路径前缀策略 - 所有语言都显示前缀
+    localePrefix: 'always',
 
     // 备用语言链接
     alternateLinks: false,
@@ -30,9 +37,65 @@ export default createMiddleware({
             zh: '/contact',
             en: '/contact',
             ja: '/contact'
+        },
+        '/dashboard': {
+            zh: '/dashboard',
+            en: '/dashboard',
+            ja: '/dashboard'
+        },
+        '/auth/signin': {
+            zh: '/auth/signin',
+            en: '/auth/signin',
+            ja: '/auth/signin'
         }
     }
 });
+
+export default function middleware(request: NextRequest) {
+    const { pathname } = request.nextUrl;
+    
+    // 获取当前语言
+    const locale = pathname.split('/')[1];
+    const isValidLocale = locales.includes(locale as any);
+    
+    // 获取实际路径（去除语言前缀）
+    const actualPath = isValidLocale ? pathname.slice(locale.length + 1) || '/' : pathname;
+    
+    // 检查是否为受保护的路径
+    const isProtectedPath = protectedPaths.some(path => actualPath.startsWith(path));
+    
+    // 检查是否为认证路径
+    const isAuthPath = authPaths.some(path => actualPath.startsWith(path));
+    
+    // 从 cookie 中获取认证状态
+    const authCookie = request.cookies.get('auth-storage');
+    let isAuthenticated = false;
+    
+    if (authCookie) {
+        try {
+            const authData = JSON.parse(authCookie.value);
+            isAuthenticated = authData.state?.isAuthenticated || false;
+        } catch (error) {
+            // Cookie 解析失败，视为未认证
+            isAuthenticated = false;
+        }
+    }
+    
+    // 如果访问受保护的路径但未认证，重定向到登录页
+    if (isProtectedPath && !isAuthenticated) {
+        const signInUrl = new URL(isValidLocale ? `/${locale}/auth/signin` : '/auth/signin', request.url);
+        return NextResponse.redirect(signInUrl);
+    }
+    
+    // 如果已认证但访问认证页面，重定向到仪表板
+    if (isAuthPath && isAuthenticated) {
+        const dashboardUrl = new URL(isValidLocale ? `/${locale}/dashboard` : '/dashboard', request.url);
+        return NextResponse.redirect(dashboardUrl);
+    }
+    
+    // 应用国际化中间件
+    return intlMiddleware(request);
+}
 
 export const config = {
     // 匹配所有路径，除了以下路径：

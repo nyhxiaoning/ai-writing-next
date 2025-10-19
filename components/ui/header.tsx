@@ -3,6 +3,7 @@
 import { a, animated, useTrail, useTransition } from "@react-spring/web";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import AuthButton from "@/components/AuthButton";
 import Dropdown from "@/components/utils/dropdown";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Link from "next/link";
@@ -11,11 +12,22 @@ import MobileMenu from "./mobile-menu";
 import { styled } from "@stitches/react";
 import styles from "./index.module.css";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const t = useTranslations("HomePage");
   const tCommon = useTranslations("Common");
   const [top, setTop] = useState<boolean>(true);
+  const pathname = usePathname();
+
+  // 获取当前语言
+  const getCurrentLocale = () => {
+    const segments = pathname.split('/');
+    const locale = segments[1];
+    return ['zh', 'en', 'ja'].includes(locale) ? locale : 'zh';
+  };
+
+  const currentLocale = getCurrentLocale();
 
   // detect whether user has scrolled the page down by 10px
   const scrollHandler = () => {
@@ -88,7 +100,7 @@ export default function Header() {
             <ul className="flex grow justify-end flex-wrap items-center">
               <li>
                 <Link
-                  href="/"
+                  href={`/${currentLocale}`}
                   className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
                 >
                   {tCommon("home")}
@@ -96,7 +108,7 @@ export default function Header() {
               </li>
               <li>
                 <Link
-                  href="/about"
+                  href={`/${currentLocale}/about`}
                   className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
                 >
                   {tCommon("about")}
@@ -104,14 +116,22 @@ export default function Header() {
               </li>
               <li>
                 <Link
-                  href="/contact"
+                  href={`/${currentLocale}/contact`}
                   className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
                 >
                   {tCommon("contact")}
                 </Link>
               </li>
+              {/* <li className="ml-3">
+                <LanguageSwitcher />
+              </li> */}
             </ul>
           </nav>
+
+          {/* 认证按钮 */}
+          <div className="hidden md:flex items-center ml-3">
+            <AuthButton />
+          </div>
 
           {/* 移动端菜单 */}
           <MobileMenu />

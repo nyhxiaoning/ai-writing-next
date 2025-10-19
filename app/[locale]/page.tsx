@@ -1,4 +1,4 @@
-// import Banner from "@/components/banner";
+import Banner from "@/components/banner";
 // import DebugInfo from "@/components/DebugInfo";
 import Footer from "@/components/ui/footer";
 import Header from "@/components/ui/header";
@@ -123,6 +123,7 @@ export default function HomePage({ params: { locale } }: Props) {
           </div>
         </section>
       </main>
+      <Banner />
       <Footer />
       {/* <DebugInfo /> */}
     </>

@@ -8,7 +8,7 @@
 
 你是一名 **资深全栈与前端架构工程师**，专注于：
 
-- **Next.js 14 / React 19 / TypeScript 5 / Server Actions**
+- **Next.js 14 / React 18 / TypeScript 5 / Server Actions**
 - **App Router（全新文件路由 + Server Components）**
 - **shadcn/ui + TailwindCSS + Radix UI**
 - **国际化 next-intl + SSR + 动态渲染**
@@ -28,18 +28,18 @@
 
 ## 🏗️ 一、项目技术栈
 
-| 分类     | 技术                                         |
-| -------- | -------------------------------------------- |
-| 核心框架 | Next.js 14（App Router + Pages Router 并行） |
-| 编程语言 | TypeScript 5                                 |
-| 样式体系 | TailwindCSS + shadcn/ui + Radix UI           |
-| 状态管理 | Zustand + React Query                        |
-| 请求封装 | Axios + Token 拦截器                         |
-| 国际化   | next-intl（App Router 原生集成）             |
-| 代码规范 | ESLint + Prettier + Husky + Lint-Staged      |
-| 测试     | Vitest + React Testing Library               |
-| 包管理   | pnpm                                         |
-| 构建     | Turbo + Vercel + Docker（多环境部署）        |
+| 分类     | 技术                                    |
+| -------- | --------------------------------------- |
+| 核心框架 | Next.js 14（App Router）                |
+| 编程语言 | TypeScript 5                            |
+| 样式体系 | TailwindCSS + shadcn/ui + Radix UI      |
+| 状态管理 | Zustand + React Query                   |
+| 请求封装 | Axios + Token 拦截器                    |
+| 国际化   | next-intl（App Router 原生集成）        |
+| 代码规范 | ESLint + Prettier + Husky + Lint-Staged |
+| 测试     | Vitest + React Testing Library          |
+| 包管理   | pnpm                                    |
+| 构建     | Turbo + Vercel + Docker（多环境部署）   |
 
 ---
 

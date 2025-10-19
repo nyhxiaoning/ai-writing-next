@@ -67,16 +67,18 @@ export default function middleware(request: NextRequest) {
     // 检查是否为认证路径
     const isAuthPath = authPaths.some(path => actualPath.startsWith(path));
     
-    // 从 cookie 中获取认证状态
-    const authCookie = request.cookies.get('auth-storage');
+    // 从 cookie 中获取JWT认证令牌
+    const authToken = request.cookies.get('auth-token');
     let isAuthenticated = false;
     
-    if (authCookie) {
+    if (authToken) {
         try {
-            const authData = JSON.parse(authCookie.value);
-            isAuthenticated = authData.state?.isAuthenticated || false;
+            // 这里可以添加JWT验证逻辑
+            // 为了性能考虑，中间件中只做简单检查
+            // 完整的JWT验证在API路由中进行
+            isAuthenticated = authToken.value && authToken.value !== '';
         } catch (error) {
-            // Cookie 解析失败，视为未认证
+            // Token 解析失败，视为未认证
             isAuthenticated = false;
         }
     }

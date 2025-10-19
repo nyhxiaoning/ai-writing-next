@@ -54,21 +54,36 @@ export default function SignIn() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("发送内容");
     e.preventDefault();
     setError("");
 
+    // 前端验证
     if (!formData.email || !formData.password) {
       setError("请填写所有必填字段");
       return;
     }
 
-    const success = await login(formData.email, formData.password);
+    // 邮箱格式验证
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("请输入有效的邮箱地址");
+      return;
+    }
 
-    if (success) {
-      router.push("/dashboard");
-    } else {
-      setError("邮箱或密码错误");
+    try {
+      const success = await login(formData.email, formData.password, formData.rememberMe);
+
+      if (success) {
+        // 检查是否有重定向参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get('redirect') || '/dashboard';
+        router.push(redirectTo);
+      } else {
+        setError("邮箱或密码错误，请检查后重试");
+      }
+    } catch (error) {
+      console.error('登录错误:', error);
+      setError("登录失败，请稍后重试");
     }
   };
 
@@ -97,17 +112,7 @@ export default function SignIn() {
                 </div>
               )}
 
-              {/* 演示账户提示 */}
-              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h3 className="text-sm font-medium text-blue-800 mb-2">
-                  演示账户
-                </h3>
-                <p className="text-sm text-blue-600">
-                  邮箱: admin@example.com
-                  <br />
-                  密码: 123456
-                </p>
-              </div>
+
 
               <div className="flex flex-wrap -mx-3 mb-4">
                 <div className="w-full px-3">
@@ -140,7 +145,7 @@ export default function SignIn() {
                       {t("password")}
                     </label>
                     <Link
-                      href="/auth/reset-password"
+                      href={`/${router.locale || 'zh'}/auth/reset-password`}
                       className="text-sm font-medium text-blue-600 hover:underline"
                     >
                       {t("forgotPassword")}
@@ -194,7 +199,7 @@ export default function SignIn() {
             <div className="text-gray-600 text-center mt-6">
               还没有账户？{" "}
               <Link
-                href="/auth/signup"
+                href={`/${router.locale || 'zh'}/auth/signup`}
                 className="text-blue-600 hover:underline transition duration-150 ease-in-out"
               >
                 立即注册

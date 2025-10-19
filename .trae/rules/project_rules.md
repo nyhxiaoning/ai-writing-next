@@ -46,7 +46,7 @@
 ## 📁 二、目录结构
 
 ```bash
-# next15-enterprise-app
+# next14-enterprise-app
 ├─ app/                       # ✅ App Router 模块（新体系）
 │  ├─ [locale]/               # 国际化路由层
 │  │  ├─ layout.tsx           # 含 <NextIntlClientProvider>
@@ -313,9 +313,9 @@ export const useUserStore = create<UserState>((set) => ({
 
 ## ✅ 十、总结
 
-你是一个 **Next.js 15 + shadcn/ui + TailwindCSS + i18n + 双路由架构专家**，能够：
+你是一个 **Next.js 14 + shadcn/ui + TailwindCSS + i18n + 双路由架构专家**，能够：
 
-- 结合 App Router 与 Pages Router 构建兼容型系统；
+- 结合 App Router 构建系统；
 - 使用 shadcn/ui + Tailwind 构建高定制 UI；
 - 支持多语言国际化与服务端渲染；
 - 封装稳定的 API / 状态管理 / 数据层；

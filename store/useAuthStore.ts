@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>()(
                     await new Promise(resolve => setTimeout(resolve, 1000));
 
                     // 模拟登录验证（演示用）
-                    if (email === 'admin@example.com' && password === 'password') {
+                    if (email === 'admin@example.com' && password === '123456') {
                         const user: User = {
                             id: '1',
                             email: email,

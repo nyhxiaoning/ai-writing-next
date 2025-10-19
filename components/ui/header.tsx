@@ -11,8 +11,8 @@ import Logo from "./logo";
 import MobileMenu from "./mobile-menu";
 import { styled } from "@stitches/react";
 import styles from "./index.module.css";
-import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function Header() {
   const t = useTranslations("HomePage");
@@ -22,9 +22,9 @@ export default function Header() {
 
   // 获取当前语言
   const getCurrentLocale = () => {
-    const segments = pathname.split('/');
+    const segments = pathname.split("/");
     const locale = segments[1];
-    return ['zh', 'en', 'ja'].includes(locale) ? locale : 'zh';
+    return ["zh", "en", "ja"].includes(locale) ? locale : "zh";
   };
 
   const currentLocale = getCurrentLocale();
@@ -71,9 +71,12 @@ export default function Header() {
     );
   }, [t]);
 
+  /**
+   * 首页欢迎动效展示：
+   */
   useEffect(() => {
-    // reset();
-    // return () => reftwo.current.forEach(clearTimeout);
+    reset();
+    return () => reftwo.current.forEach(clearTimeout);
   }, []);
   useEffect(() => {
     scrollHandler();

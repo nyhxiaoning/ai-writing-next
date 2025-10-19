@@ -31,7 +31,7 @@ export default function AboutPage({ params: { locale } }: Props) {
                 </h1>
                 <div className="max-w-3xl mx-auto">
                   <p className="text-xl text-gray-600 mb-8">
-                    了解我们的团队和使命
+                    {tCommon("valuesystem")}
                   </p>
                 </div>
               </div>

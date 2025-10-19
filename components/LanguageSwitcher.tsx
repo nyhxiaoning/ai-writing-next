@@ -30,14 +30,13 @@ export default function LanguageSwitcher() {
     startTransition(() => {
       // 获取当前路径，移除语言前缀
       let pathWithoutLocale = pathname;
-      console.log("%s 当前的值💡 pathname");
       console.log(
-        "%c💡 pathname当前的最新打印，用完删除",
+        "%c💡 pathWithoutLocale 当前的最新打印，用完删除",
         "background-color:blue;color:#fff",
-        pathname
+        pathWithoutLocale
       );
       // 如果当前路径包含语言前缀，移除它
-      if (pathname.startsWith(`/${locale}`) && locale !== "zh") {
+      if (pathname.startsWith(`/${locale}`)) {
         pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";
       }
 
@@ -50,6 +49,8 @@ export default function LanguageSwitcher() {
         }`;
       } else {
         // 其他语言需要前缀
+        // 重写这个路由，将之前的语言前缀替换为新的语言前缀
+
         newPath = `/${newLocale}${
           pathWithoutLocale === "/" ? "" : pathWithoutLocale
         }`;

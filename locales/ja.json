@@ -409,7 +409,9 @@
             "cancel": "キャンセル",
             "create": "作品を作成",
             "update": "作品を更新",
-            "selectGenre": "ジャンルを選択"
+            "selectGenre": "ジャンルを選択",
+            "genreOther": "その他",
+            "genreOtherPlaceholder": "カスタムジャンル名を入力..."
         }
     }
 }

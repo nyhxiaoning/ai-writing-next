@@ -5,7 +5,13 @@ import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import ChapterList from '@/components/wordflow/ChapterList';
-import { Save, Clock, History, Loader2 } from 'lucide-react';
+import GitHubSyncModal from '@/components/wordflow/GitHubSyncModal';
+import AIRewritePanel from '@/components/wordflow/AIRewritePanel';
+import RhythmAnalysisPanel from '@/components/wordflow/RhythmAnalysisPanel';
+import AIChatDialog from '@/components/wordflow/AIChatDialog';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useRouter } from 'next/navigation';
+import { Save, Clock, History, Upload, Loader2, Wand2, BarChart3 } from 'lucide-react';
 
 // Dynamic import to avoid SSR issues
 const ChapterEditor = dynamic(() => import('@/components/wordflow/ChapterEditor'), { ssr: false });
@@ -47,15 +53,28 @@ export default function StudioPage() {
   const [activeChapterId, setActiveChapterId] = useState<string | null>(null);
   const [chapterContent, setChapterContent] = useState<ChapterContent | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-  const [showVersion, setShowVersion] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [rightTab, setRightTab] = useState<'history' | 'rewrite' | 'analysis' | null>(null);
+  const [showSyncModal, setShowSyncModal] = useState(false);
   const [versions, setVersions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const checkAuth = useAuthStore((s) => s.checkAuth);
+  const router = useRouter();
+  const locale = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : 'zh';
+  const [syncing, setSyncing] = useState(false);
+  const [syncConfig, setSyncConfig] = useState<any>(null);
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch book data
   const fetchBook = useCallback(async () => {
     try {
       const res = await fetch(`/api/wordflow/books/${bookId}`);
+      if (res.status === 401) {
+        router.push(`/${locale}/auth/signin`);
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         setBook(data.book);
@@ -69,6 +88,19 @@ export default function StudioPage() {
       console.error('Failed to fetch book', e);
     } finally {
       setLoading(false);
+    }
+  }, [bookId]);
+
+  // Fetch sync config
+  const fetchSyncConfig = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/wordflow/books/${bookId}/sync`);
+      if (res.ok) {
+        const data = await res.json();
+        setSyncConfig(data.config);
+      }
+    } catch (e) {
+      console.error('Failed to fetch sync config', e);
     }
   }, [bookId]);
 
@@ -87,8 +119,20 @@ export default function StudioPage() {
 
   // Initial load
   useEffect(() => {
-    fetchBook();
-  }, [fetchBook]);
+    const init = async () => {
+      if (!isAuthenticated) {
+        await checkAuth();
+      }
+      if (useAuthStore.getState().isAuthenticated) {
+        fetchBook();
+        fetchSyncConfig();
+      } else {
+        setLoading(false);
+        setAuthChecked(true);
+      }
+    };
+    init();
+  }, [fetchBook, fetchSyncConfig]);
 
   // Load chapter content when switching
   useEffect(() => {
@@ -110,6 +154,7 @@ export default function StudioPage() {
       });
       if (res.ok) {
         setSaveStatus('saved');
+        setLastSavedAt(new Date());
         // Update chapter list word count
         const contentText = content.replace(/<[^>]*>/g, '');
         setChapters((prev) =>
@@ -174,28 +219,31 @@ export default function StudioPage() {
   };
 
   const handleReorder = async (chapterIds: string[]) => {
-    // Optimistic update
-    setChapters((prev) => {
-      const map = new Map(prev.map((c) => [c.id, c]));
-      return chapterIds.map((id, i) => ({ ...map.get(id)!, sortOrder: i }));
-    });
-
     try {
-      await fetch(`/api/wordflow/books/${bookId}/chapters/reorder`, {
-        method: 'POST',
+      const res = await fetch(`/api/wordflow/books/${bookId}/chapters/reorder`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterIds }),
       });
+      if (res.ok) {
+        setChapters((prev) =>
+          chapterIds.map((id, i) => {
+            const ch = prev.find((c) => c.id === id)!;
+            return { ...ch, sortOrder: i };
+          })
+        );
+      }
     } catch (e) {
-      console.error('Reorder failed', e);
-      fetchBook();
+      console.error('Failed to reorder', e);
     }
   };
 
   const handleFetchVersions = async () => {
     if (!activeChapterId) return;
     try {
-      const res = await fetch(`/api/wordflow/books/${bookId}/chapters/${activeChapterId}/versions`);
+      const res = await fetch(
+        `/api/wordflow/books/${bookId}/chapters/${activeChapterId}/versions`
+      );
       if (res.ok) {
         const data = await res.json();
         setVersions(data.versions || []);
@@ -204,6 +252,36 @@ export default function StudioPage() {
       console.error('Failed to fetch versions', e);
     }
   };
+
+  const handleSyncNow = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch(`/api/wordflow/books/${bookId}/sync/sync-now`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        // Refresh sync config to get updated lastSyncedAt
+        await fetchSyncConfig();
+      }
+    } catch (e) {
+      console.error('Sync failed', e);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleSyncConfigSaved = () => {
+    fetchSyncConfig();
+  };
+
+  // If auth checked and not authenticated, show message that will redirect
+  if (authChecked && !isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32">
+        <p className="text-gray-500 mb-4">请先登录后访问写作台</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -247,12 +325,12 @@ export default function StudioPage() {
                 setChapterContent((prev) => (prev ? { ...prev, title: e.target.value } : prev))
               }
               onBlur={() => saveChapter(chapterContent.title, chapterContent.content)}
-              className="text-lg font-semibold text-gray-900 bg-transparent border-none focus:outline-none focus:ring-0 p-0"
+              className="text-lg font-semibold text-gray-900 bg-transparent border-none focus:outline-none focus:ring-0 p-0 flex-1 min-w-0 mr-4"
               placeholder={st('chapterTitlePlaceholder')}
             />
-            <div className="flex items-center gap-3">
-              {/* Save status */}
-              <span className="flex items-center gap-1 text-xs text-gray-400">
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Save status with time */}
+              <span className="flex items-center gap-1.5 text-xs text-gray-400 whitespace-nowrap">
                 {saveStatus === 'saving' && (
                   <>
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -263,24 +341,80 @@ export default function StudioPage() {
                   <>
                     <Save className="h-3 w-3 text-green-500" />
                     {st('saved')}
+                    {lastSavedAt && (
+                      <span className="text-gray-400"> {lastSavedAt.toLocaleTimeString()}</span>
+                    )}
+                  </>
+                )}
+                {saveStatus === 'idle' && lastSavedAt && (
+                  <>
+                    <Clock className="h-3 w-3 text-gray-400" />
+                    <span>{lastSavedAt.toLocaleTimeString()}</span>
                   </>
                 )}
               </span>
 
-              {/* Version history toggle */}
+              {/* GitHub Sync button */}
+              {syncConfig && (
+                <button
+                  onClick={handleSyncNow}
+                  disabled={syncing}
+                  className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 disabled:opacity-50"
+                  title={syncConfig.lastSyncedAt ? `上次同步: ${new Date(syncConfig.lastSyncedAt).toLocaleString()}` : '同步到 GitHub'}
+                >
+                  {syncing ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Upload className="h-3.5 w-3.5" />
+                  )}
+                  同步
+                </button>
+              )}
+              <button
+                onClick={() => setShowSyncModal(true)}
+                className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                {syncConfig ? '同步设置' : 'GitHub 同步'}
+              </button>
+
+              {/* Right panel toggles */}
               <button
                 onClick={() => {
-                  setShowVersion(!showVersion);
-                  if (!showVersion) handleFetchVersions();
+                  const next = rightTab === 'history' ? null : 'history';
+                  setRightTab(next);
+                  if (next === 'history') handleFetchVersions();
                 }}
                 className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                  showVersion
+                  rightTab === 'history'
                     ? 'bg-blue-100 text-blue-600'
                     : 'text-gray-500 hover:bg-gray-100'
                 }`}
               >
                 <History className="h-3.5 w-3.5" />
                 {st('versionHistory')}
+              </button>
+              <button
+                onClick={() => setRightTab(rightTab === 'rewrite' ? null : 'rewrite')}
+                className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                  rightTab === 'rewrite'
+                    ? 'bg-purple-100 text-purple-600'
+                    : 'text-gray-500 hover:bg-gray-100'
+                }`}
+              >
+                <Wand2 className="h-3.5 w-3.5" />
+                AI 改写
+              </button>
+              <button
+                onClick={() => setRightTab(rightTab === 'analysis' ? null : 'analysis')}
+                className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                  rightTab === 'analysis'
+                    ? 'bg-indigo-100 text-indigo-600'
+                    : 'text-gray-500 hover:bg-gray-100'
+                }`}
+              >
+                <BarChart3 className="h-3.5 w-3.5" />
+                节奏分析
               </button>
             </div>
           </div>
@@ -310,34 +444,76 @@ export default function StudioPage() {
         </div>
       </div>
 
-      {/* Right: Version history panel */}
-      {showVersion && (
+      {/* Right: Tabbed panel (History / AI Rewrite / Rhythm Analysis) */}
+      {rightTab && (
         <div className="w-72 shrink-0 overflow-y-auto rounded-lg border border-gray-200 bg-white p-3">
-          <h3 className="mb-3 text-sm font-medium text-gray-700">{st('versionHistory')}</h3>
-          {versions.length === 0 ? (
-            <p className="text-sm text-gray-400">暂无历史版本</p>
-          ) : (
-            <div className="space-y-2">
-              {versions.map((v: any, i: number) => (
-                <div
-                  key={v.id}
-                  className="rounded-lg border border-gray-100 p-2.5 text-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-700">
-                      v{versions.length - i}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(v.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-gray-500">{v.wordCount} 字</p>
+          {/* Tab bar */}
+          <div className="mb-3 flex gap-1 rounded-md bg-gray-100 p-0.5">
+            {(['history', 'rewrite', 'analysis'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => {
+                  setRightTab(rightTab === tab ? null : tab);
+                  if (tab === 'history') handleFetchVersions();
+                }}
+                className={`flex-1 rounded px-2 py-1 text-[11px] font-medium transition-colors ${
+                  rightTab === tab ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {tab === 'history' ? st('versionHistory') : tab === 'rewrite' ? 'AI 改写' : '节奏分析'}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab content */}
+          {rightTab === 'history' && (
+            <>
+              {versions.length === 0 ? (
+                <p className="py-8 text-center text-sm text-gray-400">暂无历史版本</p>
+              ) : (
+                <div className="space-y-2">
+                  {versions.map((v: any, i: number) => (
+                    <div key={v.id} className="rounded-lg border border-gray-100 p-2.5 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-gray-700">v{versions.length - i}</span>
+                        <span className="text-xs text-gray-400">
+                          {new Date(v.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-gray-500">{v.wordCount} 字</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              )}
+            </>
+          )}
+          {rightTab === 'rewrite' && (
+            <AIRewritePanel
+              chapterContent={chapterContent?.content}
+              onInsert={(html) => {
+                if (chapterContent) {
+                  handleContentChange(html);
+                }
+              }}
+            />
+          )}
+          {rightTab === 'analysis' && (
+            <RhythmAnalysisPanel chapterId={activeChapterId || undefined} bookId={bookId} />
           )}
         </div>
       )}
+
+      {/* GitHub Sync Modal */}
+      <GitHubSyncModal
+        open={showSyncModal}
+        bookId={bookId}
+        config={syncConfig}
+        onClose={() => setShowSyncModal(false)}
+        onSaved={handleSyncConfigSaved}
+      />
+
+      {/* AI Chat Dialog */}
+      <AIChatDialog bookId={bookId} />
     </div>
   );
 }

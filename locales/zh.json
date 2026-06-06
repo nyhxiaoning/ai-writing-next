@@ -409,7 +409,9 @@
             "cancel": "取消",
             "create": "创建作品",
             "update": "更新作品",
-            "selectGenre": "选择分类"
+            "selectGenre": "选择分类",
+            "genreOther": "其他",
+            "genreOtherPlaceholder": "请输入分类名称..."
         }
     }
 }

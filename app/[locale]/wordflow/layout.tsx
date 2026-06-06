@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import WordFlowSidebar from '@/components/wordflow/WordFlowSidebar';
 import WordFlowTopNav from '@/components/wordflow/WordFlowTopNav';
+import AIChatDialog from '@/components/wordflow/AIChatDialog';
 
 export default function WordFlowLayout({ children }: { children: ReactNode }) {
   return (
@@ -14,6 +15,8 @@ export default function WordFlowLayout({ children }: { children: ReactNode }) {
           {children}
         </main>
       </div>
+      {/* Global AI Chat Dialog — available on all WordFlow pages */}
+      <AIChatDialog />
     </div>
   );
 }

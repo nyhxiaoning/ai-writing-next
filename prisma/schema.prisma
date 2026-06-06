@@ -28,6 +28,9 @@ model User {
   communityPosts    CommunityPost[]
   comments          Comment[]
   templates         Template[]
+  syncConfigs       BookSyncConfig[]
+  aiConfig          AiConfig?
+  aiChatSessions    AiChatSession[]
 }
 
 // === Existing Post model (unchanged, Int ID) ===
@@ -66,6 +69,8 @@ model Book {
   notes       Note[]
   outlineNodes OutlineNode[]
   batchReplaceRecords BatchReplaceRecord[]
+  syncConfig BookSyncConfig?
+  aiChatSessions AiChatSession[]
 
   @@index([userId])
 }
@@ -360,4 +365,65 @@ model Template {
   @@index([genre])
   @@index([type])
   @@index([userId])
+}
+
+// --- GitHub Sync ---
+
+model BookSyncConfig {
+  id            String   @id @default(cuid())
+  githubOwner   String
+  githubRepo    String
+  githubPath    String
+  githubToken   String
+  lastSyncedAt  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  bookId        String   @unique
+  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+}
+
+// --- AI ---
+
+model AiConfig {
+  id        String   @id @default(cuid())
+  provider  String   @default("openai")
+  apiKey    String
+  baseUrl   String?
+  model     String   @default("gpt-4o")
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model AiChatSession {
+  id        String           @id @default(cuid())
+  title     String?
+  bookId    String?
+  book      Book?            @relation(fields: [bookId], references: [id], onDelete: SetNull)
+  userId    Int
+  user      User             @relation(fields: [userId], references: [id])
+  messages  AiChatMessage[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([bookId])
+}
+
+model AiChatMessage {
+  id        String        @id @default(cuid())
+  role      String
+  content   String
+  sessionId String
+  session   AiChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+
+  @@index([sessionId])
 }

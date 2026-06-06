@@ -409,7 +409,9 @@
             "cancel": "Cancel",
             "create": "Create Book",
             "update": "Update Book",
-            "selectGenre": "Select Genre"
+            "selectGenre": "Select Genre",
+            "genreOther": "Other",
+            "genreOtherPlaceholder": "Enter custom genre name..."
         }
     }
 }

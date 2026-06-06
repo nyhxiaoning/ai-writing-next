@@ -68,7 +68,7 @@ export default function MobileMenu() {
         aria-expanded={mobileNavOpen}
         onClick={() => setMobileNavOpen(!mobileNavOpen)}
       >
-        <span className=\"sr-only\">{tCommon('menu')}</span>
+        <span className="sr-only">{tCommon('menu')}</span>
         <svg className="w-6 h-6 fill-current text-gray-900" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <rect y="4" width="24" height="2" />
           <rect y="11" width="24" height="2" />

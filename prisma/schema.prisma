@@ -1,17 +1,13 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
+// === Existing User model (unchanged, Int ID) ===
 model User {
   id                Int       @id @default(autoincrement())
   name              String
@@ -25,12 +21,343 @@ model User {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   posts             Post[]
+  books             Book[]
+  notes             Note[]
+  focusSessions     FocusSession[]
+  batchReplaceRecords BatchReplaceRecord[]
+  communityPosts    CommunityPost[]
+  comments          Comment[]
+  templates         Template[]
 }
 
+// === Existing Post model (unchanged, Int ID) ===
 model Post {
   id      Int     @id @default(autoincrement())
   title   String
   content String
   userId  Int
   user    User    @relation(fields: [userId], references: [id])
+}
+
+// =============================================
+// NEW: WordFlow Models (all use String cuid() IDs)
+// =============================================
+
+// --- Writing Studio ---
+
+model Book {
+  id          String     @id @default(cuid())
+  title       String
+  cover       String?
+  genre       String?
+  description String?
+  wordGoal    Int?
+  status      String     @default("draft") // draft/ongoing/finished/archived
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+  chapters    Chapter[]
+  characters  Character[]
+  factions    Faction[]
+  equipment   Equipment[]
+  timelineEvents TimelineEvent[]
+  maps        Map[]
+  notes       Note[]
+  outlineNodes OutlineNode[]
+  batchReplaceRecords BatchReplaceRecord[]
+
+  @@index([userId])
+}
+
+model Chapter {
+  id        String           @id @default(cuid())
+  title     String
+  content   String
+  wordCount Int              @default(0)
+  sortOrder Int              @default(0)
+  status    String           @default("draft") // draft/published/archived
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  bookId    String
+  book      Book             @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  versions  ChapterVersion[]
+
+  @@index([bookId])
+  @@index([sortOrder])
+}
+
+model ChapterVersion {
+  id        String   @id @default(cuid())
+  content   String
+  wordCount Int      @default(0)
+  note      String?
+  createdAt DateTime @default(now())
+  chapterId String
+  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@index([chapterId])
+  @@index([createdAt])
+}
+
+// --- World Building ---
+
+model Character {
+  id          String   @id @default(cuid())
+  name        String
+  alias       String?
+  role        String?
+  description String?
+  appearance  String?
+  personality String?
+  background  String?
+  abilities   String?
+  avatar      String?
+  metadata    String?  // JSON for custom fields
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  factionId   String?
+  faction     Faction? @relation("FactionMembers", fields: [factionId], references: [id])
+  equipment   Equipment[]
+
+  @@index([bookId])
+  @@index([factionId])
+}
+
+model Faction {
+  id          String      @id @default(cuid())
+  name        String
+  type        String?
+  description String?
+  ideology    String?
+  leaderId    String?
+  leaderName  String?
+  territory   String?
+  logo        String?
+  metadata    String?     // JSON for custom fields
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  bookId      String
+  book        Book        @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  members     Character[] @relation("FactionMembers")
+
+  @@index([bookId])
+}
+
+model Equipment {
+  id          String    @id @default(cuid())
+  name        String
+  type        String?
+  description String?
+  rarity      String?
+  properties  String?   // JSON for stats/effects
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookId      String
+  book        Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  ownerId     String?
+  owner       Character? @relation(fields: [ownerId], references: [id])
+
+  @@index([bookId])
+  @@index([ownerId])
+}
+
+model TimelineEvent {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  dateLabel   String?
+  sortOrder   Float    @default(0)
+  eventType   String?
+  color       String?
+  metadata    String?  // JSON
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@index([sortOrder])
+}
+
+model Map {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  width       Int         @default(800)
+  height      Int         @default(600)
+  background  String?
+  canvasData  String?     // Fabric.js JSON serialization
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  bookId      String
+  book        Book        @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  markers     MapMarker[]
+
+  @@index([bookId])
+}
+
+model MapMarker {
+  id        String   @id @default(cuid())
+  label     String
+  x         Float
+  y         Float
+  type      String?
+  color     String?
+  popupText String?
+  icon      String?
+  mapId     String
+  map       Map      @relation(fields: [mapId], references: [id], onDelete: Cascade)
+
+  @@index([mapId])
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  category  String?  // plot/character/location/research/idea/todo
+  color     String?
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([bookId])
+  @@index([userId])
+  @@index([category])
+}
+
+// --- Focus Mode ---
+
+model FocusSession {
+  id        String   @id @default(cuid())
+  duration  Int      // seconds
+  type      String   // pomodoro/white_noise/free_write/typewriter
+  completed Boolean  @default(false)
+  wordCount Int?
+  notes     String?
+  metadata  String?  // JSON
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// --- Toolkit ---
+
+model OutlineNode {
+  id        String        @id @default(cuid())
+  title     String
+  content   String?
+  sortOrder Int           @default(0)
+  depth     Int           @default(0)
+  nodeType  String?
+  collapsed Boolean       @default(false)
+  metadata  String?       // JSON
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  bookId    String
+  book      Book          @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    OutlineNode?  @relation("OutlineTree", fields: [parentId], references: [id])
+  children  OutlineNode[] @relation("OutlineTree")
+
+  @@index([bookId])
+  @@index([parentId])
+  @@index([sortOrder])
+}
+
+model BatchReplaceRecord {
+  id               String   @id @default(cuid())
+  name             String?
+  searchText       String
+  replaceText      String
+  scope            String   @default("book") // book/chapter/selection
+  caseSensitive    Boolean  @default(false)
+  useRegex         Boolean  @default(false)
+  matches          Int      @default(0)
+  replaced         Int      @default(0)
+  affectedChapters String?  // JSON array of chapter IDs
+  createdAt        DateTime @default(now())
+  bookId           String
+  book             Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId           Int
+  user             User     @relation(fields: [userId], references: [id])
+
+  @@index([bookId])
+  @@index([userId])
+}
+
+// --- Community ---
+
+model CommunityPost {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  excerpt   String?
+  tags      String?
+  type      String    @default("post") // post/question/showcase/tutorial
+  likes     Int       @default(0)
+  views     Int       @default(0)
+  pinned    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  comments  Comment[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([type])
+}
+
+model Comment {
+  id        String        @id @default(cuid())
+  content   String
+  likes     Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  userId    Int
+  user      User          @relation(fields: [userId], references: [id])
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment?      @relation("CommentThread", fields: [parentId], references: [id])
+  replies   Comment[]     @relation("CommentThread")
+
+  @@index([postId])
+  @@index([parentId])
+  @@index([userId])
+}
+
+// --- Templates ---
+
+model Template {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  genre       String?
+  type        String   @default("outline") // outline/character_setting/world_setting/chapter/story_bible
+  content     String
+  cover       String?
+  isOfficial  Boolean  @default(false)
+  likes       Int      @default(0)
+  usageCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id])
+
+  @@index([genre])
+  @@index([type])
+  @@index([userId])
 }

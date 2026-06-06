@@ -3,7 +3,7 @@ import createMiddleware from 'next-intl/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 
 // 需要认证的路径
-const protectedPaths = ['/dashboard'];
+const protectedPaths = ['/dashboard', '/wordflow'];
 
 // 认证相关路径
 const authPaths = ['/auth/signin', '/auth/signup', '/auth/reset-password'];
@@ -47,6 +47,11 @@ const intlMiddleware = createMiddleware({
             zh: '/auth/signin',
             en: '/auth/signin',
             ja: '/auth/signin'
+        },
+        '/wordflow': {
+            zh: '/wordflow',
+            en: '/wordflow',
+            ja: '/wordflow'
         }
     }
 });
@@ -76,7 +81,7 @@ export default function middleware(request: NextRequest) {
             // 这里可以添加JWT验证逻辑
             // 为了性能考虑，中间件中只做简单检查
             // 完整的JWT验证在API路由中进行
-            isAuthenticated = authToken.value && authToken.value !== '';
+            isAuthenticated = !!authToken.value;
         } catch (error) {
             // Token 解析失败，视为未认证
             isAuthenticated = false;

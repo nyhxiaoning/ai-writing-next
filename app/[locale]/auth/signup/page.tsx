@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 /**
@@ -30,6 +30,7 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations("Auth");
 
   /**
@@ -112,7 +113,7 @@ export default function SignUp() {
         formData.email,
         formData.password,
         formData.confirmPassword,
-        router.locale || 'zh'
+        pathname?.split('/')[1] || 'zh'
       );
 
       if (result.success) {
@@ -264,7 +265,7 @@ export default function SignUp() {
             <div className="text-gray-600 text-center mt-6">
               {t("hasAccount")}{" "}
               <Link
-                href={`/${router.locale || 'zh'}/auth/signin`}
+                href={`/${pathname?.split('/')[1] || 'zh'}/auth/signin`}
                 className="text-blue-600 hover:underline transition duration-150 ease-in-out"
               >
                 {t("signin")}

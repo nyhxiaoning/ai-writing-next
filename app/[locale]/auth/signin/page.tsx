@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 /**
@@ -28,6 +28,7 @@ export default function SignIn() {
   });
   const [error, setError] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations("Auth");
 
   /**
@@ -145,7 +146,7 @@ export default function SignIn() {
                       {t("password")}
                     </label>
                     <Link
-                      href={`/${router.locale || 'zh'}/auth/reset-password`}
+                      href={`/${pathname?.split('/')[1] || 'zh'}/auth/reset-password`}
                       className="text-sm font-medium text-blue-600 hover:underline"
                     >
                       {t("forgotPassword")}
@@ -199,7 +200,7 @@ export default function SignIn() {
             <div className="text-gray-600 text-center mt-6">
               {t("noAccountYet")}{" "}
               <Link
-                href={`/${router.locale || 'zh'}/auth/signup`}
+                href={`/${pathname?.split('/')[1] || 'zh'}/auth/signup`}
                 className="text-blue-600 hover:underline transition duration-150 ease-in-out"
               >
                 立即注册

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { getUserFromRequest } from '@/lib/auth';
 
-const prisma = new PrismaClient();
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -45,7 +45,5 @@ export async function GET(request: NextRequest) {
       { error: '服务器内部错误' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

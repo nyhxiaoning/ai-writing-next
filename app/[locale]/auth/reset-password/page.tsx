@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 /**
@@ -20,6 +20,7 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations("Auth");
 
   // 判断是请求重置还是确认重置
@@ -46,7 +47,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const result = await requestPasswordReset(email, router.locale || 'zh');
+      const result = await requestPasswordReset(email, pathname.split('/')[1] || 'zh');
       
       if (result.success) {
         setSuccess(t("resetEmailSent"));
@@ -93,7 +94,7 @@ export default function ResetPassword() {
       if (result.success) {
         setSuccess(t("resetSuccessRedirect"));
         setTimeout(() => {
-          router.push(`/${router.locale || 'zh'}/auth/signin`);
+          router.push(`/${pathname?.split("/")[1] || "zh"}/auth/signin`);
         }, 2000);
       } else {
         setError(result.error || t("resetFailed"));
@@ -238,7 +239,7 @@ export default function ResetPassword() {
             <div className="text-gray-600 text-center mt-6">
               {t("rememberPassword")}{" "}
               <Link
-                href={`/${router.locale || 'zh'}/auth/signin`}
+                href={`/${pathname?.split("/")[1] || "zh"}/auth/signin`}
                 className="text-blue-600 hover:underline transition duration-150 ease-in-out"
               >
                 {t("signin")}

@@ -111,8 +111,8 @@ export const useAuthStore = create<AuthState>()(
              * 设置用户信息
              * @param user 用户对象
              */
-            setUser: (user: User) => {
-                set({ user, isAuthenticated: true });
+            setUser: (user: User | null) => {
+                set({ user, isAuthenticated: !!user });
             },
 
             /**

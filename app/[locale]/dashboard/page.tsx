@@ -12,6 +12,8 @@ export default function Dashboard() {
   const { user, logout } = useAuthStore();
   const router = useRouter();
   const t = useTranslations('Navigation');
+  const tDash = useTranslations('Dashboard');
+  const tCommon = useTranslations('Common');
 
   /**
    * Events
@@ -65,34 +67,34 @@ export default function Dashboard() {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    欢迎来到系统主页！
+                    {tDash('welcomeTitle')}
                   </h2>
                   <p className="text-gray-600 mb-6">
-                    您已成功登录，这里是您的个人仪表板。
+                    {tDash('welcomeDesc')}
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
                     <div className="bg-white p-6 rounded-lg shadow">
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        用户信息
+                        {tDash('userInfo')}
                       </h3>
                       <p className="text-gray-600">
-                        邮箱: {user?.email}
+                        {tCommon('email')}: {user?.email}
                       </p>
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow">
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        系统状态
+                        {tDash('systemStatus')}
                       </h3>
                       <p className="text-green-600">
-                        ✅ 系统运行正常
+                        {tDash('systemNormal')}
                       </p>
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow">
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        快速操作
+                        {tDash('quickActions')}
                       </h3>
                       <button className="text-blue-600 hover:text-blue-800">
-                        查看设置
+                        {tDash('viewSettings')}
                       </button>
                     </div>
                   </div>

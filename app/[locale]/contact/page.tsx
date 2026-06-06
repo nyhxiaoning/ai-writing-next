@@ -11,6 +11,7 @@ export default function ContactPage({ params: { locale } }: Props) {
   unstable_setRequestLocale(locale);
 
   const tCommon = useTranslations("Common");
+  const tContact = useTranslations("Contact");
 
   return (
     <>
@@ -30,7 +31,7 @@ export default function ContactPage({ params: { locale } }: Props) {
                 </h1>
                 <div className="max-w-3xl mx-auto">
                   <p className="text-xl text-gray-600 mb-8">
-                    我们很乐意听到您的声音
+                    {tContact("weLoveToHear")}
                   </p>
                 </div>
               </div>
@@ -44,14 +45,14 @@ export default function ContactPage({ params: { locale } }: Props) {
                         htmlFor="firstName"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
-                        姓名
+                        {tContact("name")}
                       </label>
                       <input
                         type="text"
                         id="firstName"
                         name="firstName"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="请输入您的姓名"
+                        placeholder={tContact("namePlaceholder")}
                       />
                     </div>
 
@@ -67,7 +68,7 @@ export default function ContactPage({ params: { locale } }: Props) {
                         id="email"
                         name="email"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="请输入您的邮箱"
+                        placeholder={tContact("emailPlaceholder")}
                       />
                     </div>
                   </div>
@@ -77,14 +78,14 @@ export default function ContactPage({ params: { locale } }: Props) {
                       htmlFor="subject"
                       className="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      主题
+                      {tContact("subject")}
                     </label>
                     <input
                       type="text"
                       id="subject"
                       name="subject"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="请输入主题"
+                      placeholder={tContact("subjectPlaceholder")}
                     />
                   </div>
 
@@ -93,14 +94,14 @@ export default function ContactPage({ params: { locale } }: Props) {
                       htmlFor="message"
                       className="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      消息
+                      {tContact("message")}
                     </label>
                     <textarea
                       id="message"
                       name="message"
                       rows={6}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="请输入您的消息..."
+                      placeholder={tContact("messagePlaceholder")}
                     ></textarea>
                   </div>
 
@@ -133,8 +134,8 @@ export default function ContactPage({ params: { locale } }: Props) {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">邮箱</h3>
-                  <p className="text-gray-600">contact@example.com</p>
+                  <h3 className="text-lg font-semibold mb-2">{tContact("emailTitle")}</h3>
+                  <p className="text-gray-600">{tContact("emailValue")}</p>
                 </div>
 
                 <div className="text-center">
@@ -153,8 +154,8 @@ export default function ContactPage({ params: { locale } }: Props) {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">电话</h3>
-                  <p className="text-gray-600">+86 123 4567 8900</p>
+                  <h3 className="text-lg font-semibold mb-2">{tContact("phone")}</h3>
+                  <p className="text-gray-600">{tContact("phoneValue")}</p>
                 </div>
 
                 <div className="text-center">
@@ -179,8 +180,8 @@ export default function ContactPage({ params: { locale } }: Props) {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">地址</h3>
-                  <p className="text-gray-600">中国 北京市 朝阳区</p>
+                  <h3 className="text-lg font-semibold mb-2">{tContact("address")}</h3>
+                  <p className="text-gray-600">{tContact("addressValue")}</p>
                 </div>
               </div>
             </div>

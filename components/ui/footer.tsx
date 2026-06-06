@@ -1,6 +1,10 @@
 import Logo from "./logo";
+import { useTranslations } from "next-intl";
 
 export default function Footer() {
+  const t = useTranslations("Footer");
+  const tCommon = useTranslations("Common");
+
   return (
     <footer>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -16,28 +20,28 @@ export default function Footer() {
                 href="#0"
                 className="text-gray-600 hover:text-gray-900 hover:underline transition duration-150 ease-in-out"
               >
-                Terms
+                {t("terms")}
               </a>{" "}
               ·{" "}
               <a
                 href="#0"
                 className="text-gray-600 hover:text-gray-900 hover:underline transition duration-150 ease-in-out"
               >
-                Privacy Policy
+                {t("privacyPolicy")}
               </a>
             </div>
           </div>
 
           {/* 2nd block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-gray-800 font-medium mb-2">Products</h6>
+            <h6 className="text-gray-800 font-medium mb-2">{t("products")}</h6>
             <ul className="text-sm">
               <li className="mb-2">
                 <a
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Web Studio
+                  {t("webStudio")}
                 </a>
               </li>
               <li className="mb-2">
@@ -45,7 +49,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  DynamicBox Flex
+                  {t("dynamicBoxFlex")}
                 </a>
               </li>
               <li className="mb-2">
@@ -53,7 +57,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Programming Forms
+                  {t("programmingForms")}
                 </a>
               </li>
               <li className="mb-2">
@@ -61,7 +65,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Integrations
+                  {t("integrations")}
                 </a>
               </li>
               <li className="mb-2">
@@ -69,7 +73,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Command-line
+                  {t("commandLine")}
                 </a>
               </li>
             </ul>
@@ -77,14 +81,14 @@ export default function Footer() {
 
           {/* 3rd block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-gray-800 font-medium mb-2">Resources</h6>
+            <h6 className="text-gray-800 font-medium mb-2">{t("resources")}</h6>
             <ul className="text-sm">
               <li className="mb-2">
                 <a
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Documentation
+                  {t("documentation")}
                 </a>
               </li>
               <li className="mb-2">
@@ -92,7 +96,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Tutorials & Guides
+                  {t("tutorialsGuides")}
                 </a>
               </li>
               <li className="mb-2">
@@ -100,7 +104,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Blog
+                  {t("blog")}
                 </a>
               </li>
               <li className="mb-2">
@@ -108,7 +112,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Support Center
+                  {t("supportCenter")}
                 </a>
               </li>
               <li className="mb-2">
@@ -116,7 +120,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Partners
+                  {t("partners")}
                 </a>
               </li>
             </ul>
@@ -124,14 +128,14 @@ export default function Footer() {
 
           {/* 4th block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-gray-800 font-medium mb-2">Company</h6>
+            <h6 className="text-gray-800 font-medium mb-2">{t("company")}</h6>
             <ul className="text-sm">
               <li className="mb-2">
                 <a
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Home
+                  {t("home")}
                 </a>
               </li>
               <li className="mb-2">
@@ -139,7 +143,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  About us
+                  {t("aboutUs")}
                 </a>
               </li>
               <li className="mb-2">
@@ -147,7 +151,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Company values
+                  {t("companyValues")}
                 </a>
               </li>
               <li className="mb-2">
@@ -155,7 +159,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Pricing
+                  {t("pricing")}
                 </a>
               </li>
               <li className="mb-2">
@@ -163,7 +167,7 @@ export default function Footer() {
                   href="#0"
                   className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
                 >
-                  Privacy Policy
+                  {t("privacyPolicy")}
                 </a>
               </li>
             </ul>
@@ -171,28 +175,28 @@ export default function Footer() {
 
           {/* 5th block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-3">
-            <h6 className="text-gray-800 font-medium mb-2">Subscribe</h6>
+            <h6 className="text-gray-800 font-medium mb-2">{t("subscribe")}</h6>
             <p className="text-sm text-gray-600 mb-4">
-              Get the latest news and articles to your inbox every month.
+              {t("subscribeDescription")}
             </p>
             <form>
               <div className="flex flex-wrap mb-4">
                 <div className="w-full">
                   <label className="block text-sm sr-only" htmlFor="newsletter">
-                    Email
+                    {tCommon("email")}
                   </label>
                   <div className="relative flex items-center max-w-xs">
                     <input
                       id="newsletter"
                       type="email"
                       className="form-input w-full text-gray-800 px-3 py-2 pr-12 text-sm"
-                      placeholder="Your email"
+                      placeholder={t("yourEmail")}
                       required
                     />
                     <button
                       type="submit"
                       className="absolute inset-0 left-auto"
-                      aria-label="Subscribe"
+                      aria-label={t("subscribeButton")}
                     >
                       <span
                         className="absolute inset-0 right-auto w-px -ml-px my-2 bg-gray-300"
@@ -226,7 +230,7 @@ export default function Footer() {
               <a
                 href="#0"
                 className="flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100 rounded-full shadow transition duration-150 ease-in-out"
-                aria-label="Twitter"
+                aria-label={t("twitter")}
               >
                 <svg
                   className="w-8 h-8 fill-current"
@@ -241,7 +245,7 @@ export default function Footer() {
               <a
                 href="#0"
                 className="flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100 rounded-full shadow transition duration-150 ease-in-out"
-                aria-label="Github"
+                aria-label={t("github")}
               >
                 <svg
                   className="w-8 h-8 fill-current"
@@ -256,7 +260,7 @@ export default function Footer() {
               <a
                 href="#0"
                 className="flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100 rounded-full shadow transition duration-150 ease-in-out"
-                aria-label="Facebook"
+                aria-label={t("facebook")}
               >
                 <svg
                   className="w-8 h-8 fill-current"
@@ -271,7 +275,7 @@ export default function Footer() {
 
           {/* Copyrights note */}
           <div className="text-sm text-gray-600 mr-4">
-            &copy; Cruip.com. All rights reserved.
+            {t("copyrightText")}
           </div>
         </div>
       </div>

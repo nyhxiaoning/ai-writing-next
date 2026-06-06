@@ -68,7 +68,7 @@ export default function MobileMenu() {
         aria-expanded={mobileNavOpen}
         onClick={() => setMobileNavOpen(!mobileNavOpen)}
       >
-        <span className="sr-only">Menu</span>
+        <span className=\"sr-only\">{tCommon('menu')}</span>
         <svg className="w-6 h-6 fill-current text-gray-900" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <rect y="4" width="24" height="2" />
           <rect y="11" width="24" height="2" />
@@ -125,7 +125,7 @@ export default function MobileMenu() {
                 className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" 
                 onClick={() => setMobileNavOpen(false)}
               >
-                组件演示
+                {tCommon('componentsDemo')}
               </Link>
             </li>
             

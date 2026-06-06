@@ -59,14 +59,14 @@ export default function SignIn() {
 
     // 前端验证
     if (!formData.email || !formData.password) {
-      setError("请填写所有必填字段");
+      setError(t("fillRequiredFields"));
       return;
     }
 
     // 邮箱格式验证
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setError("请输入有效的邮箱地址");
+      setError(t("invalidEmail"));
       return;
     }
 
@@ -79,11 +79,11 @@ export default function SignIn() {
         const redirectTo = urlParams.get('redirect') || '/dashboard';
         router.push(redirectTo);
       } else {
-        setError("邮箱或密码错误，请检查后重试");
+        setError(t("invalidCredentials"));
       }
     } catch (error) {
       console.error('登录错误:', error);
-      setError("登录失败，请稍后重试");
+      setError(t("logginFailedRetry"));
     }
   };
 
@@ -99,7 +99,7 @@ export default function SignIn() {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               {t("signin")}
             </h1>
-            <p className="text-xl text-gray-600">欢迎回来，请登录您的账户</p>
+            <p className="text-xl text-gray-600">{t("welcomeBack")}</p>
           </div>
 
           {/* Form */}
@@ -129,7 +129,7 @@ export default function SignIn() {
                     value={formData.email}
                     onChange={handleInputChange}
                     className="form-input w-full text-gray-800 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-                    placeholder="请输入您的邮箱地址"
+                    placeholder={t("emailPlaceholder")}
                     required
                   />
                 </div>
@@ -158,7 +158,7 @@ export default function SignIn() {
                     value={formData.password}
                     onChange={handleInputChange}
                     className="form-input w-full text-gray-800 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-                    placeholder="请输入您的密码"
+                    placeholder={t("passwordPlaceholder")}
                     required
                   />
                 </div>
@@ -190,14 +190,14 @@ export default function SignIn() {
                     disabled={isLoading}
                     className="btn text-white bg-blue-600 hover:bg-blue-700 w-full disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isLoading ? "登录中..." : t("signin")}
+                    {isLoading ? t("loggingIn") : t("signin")}
                   </button>
                 </div>
               </div>
             </form>
 
             <div className="text-gray-600 text-center mt-6">
-              还没有账户？{" "}
+              {t("noAccountYet")}{" "}
               <Link
                 href={`/${router.locale || 'zh'}/auth/signup`}
                 className="text-blue-600 hover:underline transition duration-150 ease-in-out"

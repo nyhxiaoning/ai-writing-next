@@ -34,14 +34,14 @@ export default function ResetPassword() {
     setSuccess("");
 
     if (!email) {
-      setError("请输入邮箱地址");
+      setError(t("emailRequired"));
       return;
     }
 
     // 邮箱格式验证
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError("请输入有效的邮箱地址");
+      setError(t("invalidEmail"));
       return;
     }
 
@@ -49,14 +49,14 @@ export default function ResetPassword() {
       const result = await requestPasswordReset(email, router.locale || 'zh');
       
       if (result.success) {
-        setSuccess("重置密码链接已发送到您的邮箱，请查收");
+        setSuccess(t("resetEmailSent"));
         setEmail(""); // 清空表单
       } else {
-        setError(result.error || "发送失败，请稍后重试");
+        setError(result.error || t("resetFailed"));
       }
     } catch (error) {
       console.error('请求重置密码错误:', error);
-      setError("发送失败，请稍后重试");
+      setError(t("resetFailed"));
     }
   };
 
@@ -66,24 +66,24 @@ export default function ResetPassword() {
     setSuccess("");
 
     if (!password || !confirmPassword) {
-      setError("请填写所有字段");
+      setError(t("fillAllFields"));
       return;
     }
 
     // 密码强度验证
     if (password.length < 8) {
-      setError("密码至少需要8个字符");
+      setError(t("passwordTooShort"));
       return;
     }
 
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!passwordRegex.test(password)) {
-      setError("密码必须包含至少一个字母和一个数字");
+      setError(t("passwordRequirement"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("两次输入的密码不一致");
+      setError(t("passwordMismatch"));
       return;
     }
 
@@ -91,16 +91,16 @@ export default function ResetPassword() {
       const result = await confirmPasswordReset(token!, password, confirmPassword);
       
       if (result.success) {
-        setSuccess("密码重置成功！正在跳转到登录页面...");
+        setSuccess(t("resetSuccessRedirect"));
         setTimeout(() => {
           router.push(`/${router.locale || 'zh'}/auth/signin`);
         }, 2000);
       } else {
-        setError(result.error || "重置失败，请稍后重试");
+        setError(result.error || t("resetFailed"));
       }
     } catch (error) {
       console.error('确认重置密码错误:', error);
-      setError("重置失败，请稍后重试");
+      setError(t("resetFailed"));
     }
   };
 
@@ -114,12 +114,12 @@ export default function ResetPassword() {
           {/* Page header */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              {isConfirmMode ? "设置新密码" : "重置密码"}
+              {isConfirmMode ? t("setNewPassword") : t("resetPassword")}
             </h1>
             <p className="text-xl text-gray-600">
               {isConfirmMode 
-                ? "请输入您的新密码" 
-                : "输入您的邮箱地址，我们将发送重置链接给您"
+                ? t("enterNewPassword") 
+                : t("sendResetEmailDesc")
               }
             </p>
           </div>
@@ -149,7 +149,7 @@ export default function ResetPassword() {
                       className="block text-gray-800 text-sm font-medium mb-1"
                       htmlFor="password"
                     >
-                      新密码 *
+                      {t("newPassword")} *
                     </label>
                     <input
                       id="password"
@@ -157,11 +157,11 @@ export default function ResetPassword() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="form-input w-full text-gray-800 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-                      placeholder="至少8位，包含字母和数字"
+                      placeholder={t("passwordPlaceholderHint")}
                       required
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      密码必须至少8位，包含字母和数字
+                      {t("passwordHint")}
                     </p>
                   </div>
                 </div>
@@ -172,7 +172,7 @@ export default function ResetPassword() {
                       className="block text-gray-800 text-sm font-medium mb-1"
                       htmlFor="confirmPassword"
                     >
-                      确认新密码 *
+                      {t("confirmNewPassword")} *
                     </label>
                     <input
                       id="confirmPassword"
@@ -180,7 +180,7 @@ export default function ResetPassword() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="form-input w-full text-gray-800 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-                      placeholder="请再次输入新密码"
+                      placeholder={t("reEnterNewPassword")}
                       required
                     />
                   </div>
@@ -193,7 +193,7 @@ export default function ResetPassword() {
                       disabled={isLoading}
                       className="btn text-white bg-blue-600 hover:bg-blue-700 w-full disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isLoading ? "重置中..." : "重置密码"}
+                      {isLoading ? t("resetting") : t("resetPassword")}
                     </button>
                   </div>
                 </div>
@@ -215,7 +215,7 @@ export default function ResetPassword() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="form-input w-full text-gray-800 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-                      placeholder="请输入您的邮箱地址"
+                      placeholder={t("emailPlaceholder")}
                       required
                     />
                   </div>
@@ -228,7 +228,7 @@ export default function ResetPassword() {
                       disabled={isLoading}
                       className="btn text-white bg-blue-600 hover:bg-blue-700 w-full disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isLoading ? "发送中..." : "发送重置链接"}
+                      {isLoading ? t("sendingEmail") : t("sendResetLink")}
                     </button>
                   </div>
                 </div>
@@ -236,7 +236,7 @@ export default function ResetPassword() {
             )}
 
             <div className="text-gray-600 text-center mt-6">
-              记起密码了？{" "}
+              {t("rememberPassword")}{" "}
               <Link
                 href={`/${router.locale || 'zh'}/auth/signin`}
                 className="text-blue-600 hover:underline transition duration-150 ease-in-out"

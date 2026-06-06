@@ -122,7 +122,7 @@ export default function Header() {
                   href={`/${currentLocale}/components-demo`}
                   className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
                 >
-                  组件演示
+                  {tCommon("componentsDemo")}
                 </Link>
               </li>
               <li>

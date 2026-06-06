@@ -3,6 +3,7 @@
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 /**
  * Types
@@ -22,6 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations('Auth');
 
   // 获取当前语言
   const getCurrentLocale = () => {
@@ -54,7 +56,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">正在验证身份...</p>
+          <p className="mt-4 text-gray-600">{t('verifyingIdentity')}</p>
         </div>
       </div>
     );
@@ -66,7 +68,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">正在跳转到登录页...</p>
+          <p className="mt-4 text-gray-600">{t('redirectingToLogin')}</p>
         </div>
       </div>
     );

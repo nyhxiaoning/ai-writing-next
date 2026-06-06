@@ -1,4 +1,4 @@
-import Banner from "@/components/banner";
+// import Banner from "@/components/banner";
 // import DebugInfo from "@/components/DebugInfo";
 import Footer from "@/components/ui/footer";
 import Header from "@/components/ui/header";
@@ -73,9 +73,9 @@ export default function HomePage({ params: { locale } }: Props) {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">多语言支持</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t("featureMultiLang")}</h3>
                   <p className="text-gray-600">
-                    支持中文、英文、日文等多种语言
+                    {t("featureMultiLangDesc")}
                   </p>
                 </div>
 
@@ -95,8 +95,8 @@ export default function HomePage({ params: { locale } }: Props) {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">响应式设计</h3>
-                  <p className="text-gray-600">完美适配手机、平板、桌面设备</p>
+                  <h3 className="text-xl font-semibold mb-2">{t("featureResponsive")}</h3>
+                  <p className="text-gray-600">{t("featureResponsiveDesc")}</p>
                 </div>
 
                 <div className="text-center">
@@ -115,15 +115,15 @@ export default function HomePage({ params: { locale } }: Props) {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">高性能</h3>
-                  <p className="text-gray-600">基于 Next.js 14 的现代化架构</p>
+                  <h3 className="text-xl font-semibold mb-2">{t("featurePerformance")}</h3>
+                  <p className="text-gray-600">{t("featurePerformanceDesc")}</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
       </main>
-      <Banner />
+      {/* <Banner /> */}
       <Footer />
       {/* <DebugInfo /> */}
     </>

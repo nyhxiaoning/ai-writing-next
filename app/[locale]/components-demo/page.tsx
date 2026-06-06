@@ -8,35 +8,38 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle2 } from "lucide-react"
 
+import { useTranslations } from "next-intl";
+
 export default function ComponentsDemo() {
+  const t = useTranslations("ComponentsDemo");
   return (
     <div className="container mx-auto py-8 space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">shadcn/ui 组件演示</h1>
+        <h1 className="text-3xl font-bold">{t("title")}</h1>
         <p className="text-muted-foreground">
-          这里展示了项目中集成的 shadcn/ui 组件库的基础组件
+          {t("description")}
         </p>
       </div>
 
       {/* Buttons */}
       <Card>
         <CardHeader>
-          <CardTitle>按钮组件</CardTitle>
-          <CardDescription>不同变体和尺寸的按钮</CardDescription>
+          <CardTitle>{t("buttonsTitle")}</CardTitle>
+          <CardDescription>{t("buttonsDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            <Button>默认按钮</Button>
-            <Button variant="secondary">次要按钮</Button>
-            <Button variant="outline">轮廓按钮</Button>
-            <Button variant="ghost">幽灵按钮</Button>
-            <Button variant="link">链接按钮</Button>
-            <Button variant="destructive">危险按钮</Button>
+            <Button>{t("buttonDefault")}</Button>
+            <Button variant="secondary">{t("buttonSecondary")}</Button>
+            <Button variant="outline">{t("buttonOutline")}</Button>
+            <Button variant="ghost">{t("buttonGhost")}</Button>
+            <Button variant="link">{t("buttonLink")}</Button>
+            <Button variant="destructive">{t("buttonDestructive")}</Button>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button size="sm">小按钮</Button>
-            <Button size="default">默认按钮</Button>
-            <Button size="lg">大按钮</Button>
+            <Button size="sm">{t("buttonSm")}</Button>
+            <Button size="default">{t("buttonDefault")}</Button>
+            <Button size="lg">{t("buttonLg")}</Button>
             <Button size="icon">
               <CheckCircle2 className="h-4 w-4" />
             </Button>
@@ -47,17 +50,17 @@ export default function ComponentsDemo() {
       {/* Form Components */}
       <Card>
         <CardHeader>
-          <CardTitle>表单组件</CardTitle>
-          <CardDescription>输入框和标签组件</CardDescription>
+          <CardTitle>{t("formTitle")}</CardTitle>
+          <CardDescription>{t("formDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="email">邮箱</Label>
-            <Input type="email" id="email" placeholder="请输入邮箱" />
+            <Label htmlFor="email">{t("email")}</Label>
+            <Input type="email" id="email" placeholder={t("emailPlaceholder")} />
           </div>
           <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="password">密码</Label>
-            <Input type="password" id="password" placeholder="请输入密码" />
+            <Label htmlFor="password">{t("password")}</Label>
+            <Input type="password" id="password" placeholder={t("passwordPlaceholder")} />
           </div>
         </CardContent>
       </Card>
@@ -65,15 +68,15 @@ export default function ComponentsDemo() {
       {/* Badges */}
       <Card>
         <CardHeader>
-          <CardTitle>徽章组件</CardTitle>
-          <CardDescription>不同样式的徽章</CardDescription>
+          <CardTitle>{t("badgesTitle")}</CardTitle>
+          <CardDescription>{t("badgesDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            <Badge>默认</Badge>
-            <Badge variant="secondary">次要</Badge>
-            <Badge variant="outline">轮廓</Badge>
-            <Badge variant="destructive">危险</Badge>
+            <Badge>{t("badgeDefault")}</Badge>
+            <Badge variant="secondary">{t("badgeSecondary")}</Badge>
+            <Badge variant="outline">{t("badgeOutline")}</Badge>
+            <Badge variant="destructive">{t("badgeDestructive")}</Badge>
           </div>
         </CardContent>
       </Card>
@@ -81,22 +84,22 @@ export default function ComponentsDemo() {
       {/* Alerts */}
       <Card>
         <CardHeader>
-          <CardTitle>警告组件</CardTitle>
-          <CardDescription>不同类型的警告信息</CardDescription>
+          <CardTitle>{t("alertsTitle")}</CardTitle>
+          <CardDescription>{t("alertsDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>提示</AlertTitle>
+            <AlertTitle>{t("alertInfo")}</AlertTitle>
             <AlertDescription>
-              这是一个默认的警告信息，用于显示一般性的提示内容。
+              {t("alertInfoDesc")}
             </AlertDescription>
           </Alert>
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>错误</AlertTitle>
+            <AlertTitle>{t("alertError")}</AlertTitle>
             <AlertDescription>
-              这是一个错误警告信息，用于显示错误或危险的内容。
+              {t("alertErrorDesc")}
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -105,27 +108,27 @@ export default function ComponentsDemo() {
       {/* Cards */}
       <Card>
         <CardHeader>
-          <CardTitle>卡片组件</CardTitle>
-          <CardDescription>展示卡片组件的不同部分</CardDescription>
+          <CardTitle>{t("cardsTitle")}</CardTitle>
+          <CardDescription>{t("cardsDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>示例卡片 1</CardTitle>
-                <CardDescription>这是一个示例卡片的描述</CardDescription>
+                <CardTitle>{t("card1Title")}</CardTitle>
+                <CardDescription>{t("card1Desc")}</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>这里是卡片的主要内容区域。</p>
+                <p>{t("card1Content")}</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>示例卡片 2</CardTitle>
-                <CardDescription>另一个示例卡片</CardDescription>
+                <CardTitle>{t("card2Title")}</CardTitle>
+                <CardDescription>{t("card2Desc")}</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>卡片可以包含各种类型的内容。</p>
+                <p>{t("card2Content")}</p>
               </CardContent>
             </Card>
           </div>

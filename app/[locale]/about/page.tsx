@@ -10,7 +10,7 @@ type Props = {
 export default function AboutPage({ params: { locale } }: Props) {
   unstable_setRequestLocale(locale);
 
-  const t = useTranslations("HomePage");
+  const tAbout = useTranslations("About");
   const tCommon = useTranslations("Common");
 
   return (
@@ -40,19 +40,15 @@ export default function AboutPage({ params: { locale } }: Props) {
               <div className="max-w-4xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                   <div>
-                    <h2 className="text-3xl font-bold mb-6">我们的故事</h2>
+                    <h2 className="text-3xl font-bold mb-6">{tAbout("ourStory")}</h2>
                     <p className="text-gray-600 mb-4">
-                      我们致力于创建现代化、高性能的 Web
-                      应用程序。通过使用最新的技术栈，
-                      我们为用户提供卓越的体验。
+                      {tAbout("description1")}
                     </p>
                     <p className="text-gray-600 mb-4">
-                      这个项目展示了 Next.js 14 与国际化功能的完美结合，
-                      支持多语言切换和响应式设计。
+                      {tAbout("description2")}
                     </p>
                     <p className="text-gray-600">
-                      我们相信技术应该服务于人，让每个用户都能享受到
-                      无障碍的数字体验。
+                      {tAbout("description3")}
                     </p>
                   </div>
 
@@ -72,9 +68,9 @@ export default function AboutPage({ params: { locale } }: Props) {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-semibold mb-2">持续学习</h3>
+                    <h3 className="text-xl font-semibold mb-2">{tAbout("continuousLearning")}</h3>
                     <p className="text-gray-600">
-                      我们始终保持对新技术的好奇心， 不断学习和改进我们的技能。
+                      {tAbout("continuousLearningDesc")}
                     </p>
                   </div>
                 </div>
@@ -82,31 +78,31 @@ export default function AboutPage({ params: { locale } }: Props) {
                 {/* 技术栈展示 */}
                 <div className="mt-16">
                   <h2 className="text-3xl font-bold text-center mb-12">
-                    技术栈
+                    {tAbout("techStack")}
                   </h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     <div className="text-center">
                       <div className="w-16 h-16 bg-black rounded-lg flex items-center justify-center mx-auto mb-4">
                         <span className="text-white font-bold text-xl">N</span>
                       </div>
-                      <h4 className="font-semibold">Next.js 14</h4>
-                      <p className="text-sm text-gray-600">React 框架</p>
+                      <h4 className="font-semibold">{tAbout("nextjs")}</h4>
+                      <p className="text-sm text-gray-600">{tAbout("nextjsDesc")}</p>
                     </div>
 
                     <div className="text-center">
                       <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                         <span className="text-white font-bold text-xl">TS</span>
                       </div>
-                      <h4 className="font-semibold">TypeScript</h4>
-                      <p className="text-sm text-gray-600">类型安全</p>
+                      <h4 className="font-semibold">{tAbout("typescript")}</h4>
+                      <p className="text-sm text-gray-600">{tAbout("typescriptDesc")}</p>
                     </div>
 
                     <div className="text-center">
                       <div className="w-16 h-16 bg-cyan-500 rounded-lg flex items-center justify-center mx-auto mb-4">
                         <span className="text-white font-bold text-xl">TW</span>
                       </div>
-                      <h4 className="font-semibold">Tailwind CSS</h4>
-                      <p className="text-sm text-gray-600">样式框架</p>
+                      <h4 className="font-semibold">{tAbout("tailwind")}</h4>
+                      <p className="text-sm text-gray-600">{tAbout("tailwindDesc")}</p>
                     </div>
 
                     <div className="text-center">
@@ -115,8 +111,8 @@ export default function AboutPage({ params: { locale } }: Props) {
                           i18n
                         </span>
                       </div>
-                      <h4 className="font-semibold">next-intl</h4>
-                      <p className="text-sm text-gray-600">国际化</p>
+                      <h4 className="font-semibold">{tAbout("nextIntl")}</h4>
+                      <p className="text-sm text-gray-600">{tAbout("nextIntlDesc")}</p>
                     </div>
                   </div>
                 </div>

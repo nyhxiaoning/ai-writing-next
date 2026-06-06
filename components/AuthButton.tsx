@@ -118,7 +118,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '' }) => {
             onClick={handleProfile}
             className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors duration-200"
           >
-            个人中心
+            {t("profile")}
           </button>
           <hr className="my-1" />
           <button

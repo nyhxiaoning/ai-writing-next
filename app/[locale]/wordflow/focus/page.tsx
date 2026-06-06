@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Play, Pause, RotateCcw, Volume2, VolumeX, Type, Edit3, Music } from 'lucide-react';
+import { Play, Pause, RotateCcw, Volume2, VolumeX, Type, Edit3, Music, Square } from 'lucide-react';
 
 type Mode = 'pomodoro' | 'whiteNoise' | 'typewriter' | 'freeWriting';
 
@@ -24,6 +24,7 @@ export default function FocusPage() {
         {modes.map((m) => (
           <button
             key={m.key}
+            type="button"
             onClick={() => setMode(m.key)}
             className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors ${
               mode === m.key
@@ -37,15 +38,16 @@ export default function FocusPage() {
         ))}
       </div>
 
-      {/* Content */}
-      {mode === 'pomodoro' && <PomodoroTimer />}
-      {mode === 'whiteNoise' && <WhiteNoisePlayer />}
-      {mode === 'typewriter' && <TypewriterMode />}
-      {mode === 'freeWriting' && <FreeWritingMode />}
+      {/* Content — use key to force re-mount on mode switch for clean state */}
+      {mode === 'pomodoro' && <PomodoroTimer key="pomodoro" />}
+      {mode === 'whiteNoise' && <WhiteNoisePlayer key="noise" />}
+      {mode === 'typewriter' && <TypewriterMode key="typewriter" />}
+      {mode === 'freeWriting' && <FreeWritingMode key="freewrite" />}
     </div>
   );
 }
 
+// ─── Pomodoro ────────────────────────────────────────────────────
 function PomodoroTimer() {
   const t = useTranslations('WordFlow.focus');
   const [timeLeft, setTimeLeft] = useState(25 * 60);
@@ -61,37 +63,42 @@ function PomodoroTimer() {
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
+  const clearTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
   const startTimer = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    clearTimer();
     intervalRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          // Session complete
-          setIsBreak(!isBreak);
-          if (!isBreak) setSessions((s) => s + 1);
+          setIsBreak((b) => !b);
+          setSessions((s) => s + (isBreak ? 0 : 1));
           return isBreak ? workDuration * 60 : breakDuration * 60;
         }
         return prev - 1;
       });
     }, 1000);
     setIsRunning(true);
-  }, [isBreak, workDuration, breakDuration]);
+  }, [clearTimer, isBreak, workDuration, breakDuration]);
 
   const pauseTimer = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    clearTimer();
     setIsRunning(false);
   };
 
   const resetTimer = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    clearTimer();
     setIsRunning(false);
     setIsBreak(false);
     setTimeLeft(workDuration * 60);
   };
 
-  useEffect(() => {
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, []);
+  // Cleanup on unmount
+  useEffect(() => clearTimer, [clearTimer]);
 
   const radius = 120;
   const circumference = 2 * Math.PI * radius;
@@ -99,7 +106,6 @@ function PomodoroTimer() {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Timer circle */}
       <div className="relative mb-8">
         <svg width="280" height="280" className="transform -rotate-90">
           <circle cx="140" cy="140" r={radius} fill="none" stroke="#e5e7eb" strokeWidth="8" />
@@ -124,23 +130,21 @@ function PomodoroTimer() {
         </div>
       </div>
 
-      {/* Controls */}
       <div className="mb-8 flex items-center gap-4">
         {isRunning ? (
-          <button onClick={pauseTimer} className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700">
+          <button type="button" onClick={pauseTimer} className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700">
             <Pause className="h-6 w-6" />
           </button>
         ) : (
-          <button onClick={startTimer} className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700">
+          <button type="button" onClick={startTimer} className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700">
             <Play className="h-6 w-6 ml-0.5" />
           </button>
         )}
-        <button onClick={resetTimer} className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100">
+        <button type="button" onClick={resetTimer} className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100">
           <RotateCcw className="h-4 w-4" />
         </button>
       </div>
 
-      {/* Settings */}
       <div className="flex gap-6">
         <div className="text-center">
           <label className="block text-xs text-gray-500 mb-1">{t('workDuration')}</label>
@@ -154,8 +158,7 @@ function PomodoroTimer() {
             }}
             disabled={isRunning}
             className="w-20 rounded border border-gray-300 px-3 py-1.5 text-center text-sm"
-            min={1}
-            max={120}
+            min={1} max={120}
           />
         </div>
         <div className="text-center">
@@ -169,13 +172,11 @@ function PomodoroTimer() {
             }}
             disabled={isRunning}
             className="w-20 rounded border border-gray-300 px-3 py-1.5 text-center text-sm"
-            min={1}
-            max={60}
+            min={1} max={60}
           />
         </div>
       </div>
 
-      {/* Stats */}
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-500">{t('sessions')}: {sessions}</p>
       </div>
@@ -183,27 +184,43 @@ function PomodoroTimer() {
   );
 }
 
+// ─── White Noise ─────────────────────────────────────────────────
 function WhiteNoisePlayer() {
-  const tc = useTranslations('WordFlow');
   const t = useTranslations('WordFlow.focus');
   const [active, setActive] = useState<string | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
-  const gainRef = useRef<GainNode | null>(null);
 
-  const noises = [
-    { key: 'rain', label: t('rain'), icon: '🌧️' },
-    { key: 'cafe', label: t('cafe'), icon: '☕' },
-    { key: 'forest', label: t('forest'), icon: '🌲' },
-    { key: 'deepspace', label: t('deepspace'), icon: '🌌' },
-  ];
-
-  const playNoise = (type: string) => {
+  const stopNoise = useCallback(() => {
     if (audioContextRef.current) {
       audioContextRef.current.close();
       audioContextRef.current = null;
-      setActive(null);
-      if (active === type) return;
+      sourceRef.current = null;
+    }
+    setActive(null);
+  }, []);
+
+  // Cleanup AudioContext on unmount
+  useEffect(() => {
+    return () => {
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+        sourceRef.current = null;
+      }
+    };
+  }, []);
+
+  const playNoise = (type: string) => {
+    // If clicking the already-playing type, stop it
+    if (active === type) {
+      stopNoise();
+      return;
+    }
+
+    // Stop previous noise
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
     }
 
     const ctx = new AudioContext();
@@ -214,12 +231,10 @@ function WhiteNoisePlayer() {
     const data = buffer.getChannelData(0);
 
     for (let i = 0; i < bufferSize; i++) {
-      // Generate noise based on type
       let sample: number;
       switch (type) {
         case 'rain':
           sample = Math.random() * 2 - 1;
-          // Low-pass filter effect: smooth transitions
           break;
         case 'cafe':
           sample = (Math.random() + Math.random() + Math.random()) / 3 * 2 - 1;
@@ -228,8 +243,6 @@ function WhiteNoisePlayer() {
           sample = Math.sin(i * 0.01) * 0.3 + (Math.random() * 2 - 1) * 0.5;
           break;
         case 'deepspace':
-          sample = Math.random() * 2 - 1;
-          break;
         default:
           sample = Math.random() * 2 - 1;
       }
@@ -248,17 +261,36 @@ function WhiteNoisePlayer() {
     source.start();
 
     sourceRef.current = source;
-    gainRef.current = gain;
     setActive(type);
   };
+
+  const noises = [
+    { key: 'rain', label: t('rain'), icon: '🌧️' },
+    { key: 'cafe', label: t('cafe'), icon: '☕' },
+    { key: 'forest', label: t('forest'), icon: '🌲' },
+    { key: 'deepspace', label: t('deepspace'), icon: '🌌' },
+  ];
 
   return (
     <div className="flex flex-col items-center">
       <h3 className="mb-6 text-lg font-medium text-gray-900">{t('selectNoise')}</h3>
+
+      {/* Active indicator + stop button */}
+      {active && (
+        <div className="mb-4 flex items-center gap-3 rounded-full bg-indigo-50 px-4 py-2 text-sm text-indigo-700">
+          <Volume2 className="h-4 w-4" />
+          正在播放
+          <button type="button" onClick={stopNoise} className="ml-2 flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-xs text-red-600 hover:bg-red-200">
+            <Square className="h-3 w-3" /> 停止
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4">
         {noises.map((noise) => (
           <button
             key={noise.key}
+            type="button"
             onClick={() => playNoise(noise.key)}
             className={`flex flex-col items-center gap-2 rounded-xl border-2 p-8 transition-all ${
               active === noise.key
@@ -280,16 +312,47 @@ function WhiteNoisePlayer() {
   );
 }
 
+// ─── Typewriter ───────────────────────────────────────────────────
 function TypewriterMode() {
   const t = useTranslations('WordFlow.focus');
   const [text, setText] = useState('');
 
   return (
     <div className="flex flex-col items-center">
+      <div className="w-full max-w-2xl">
+        <div className="mb-4 text-center">
+          <p className="text-sm text-gray-500">{t('writeSomething')}</p>
+        </div>
+        {/* Parent container has position:relative so the overlay textarea stays inside */}
+        <div className="relative min-h-[400px] rounded-lg border-2 border-indigo-200 bg-white shadow-sm">
+          {/* Visible text layer */}
+          <div className="p-8">
+            <p className="text-lg leading-relaxed text-gray-800">
+              {text}
+              <span className="typewriter-cursor" />
+            </p>
+          </div>
+          {/* Invisible input layer — absolutely positioned inside the relative parent */}
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="absolute inset-0 resize-none bg-transparent p-8 text-lg leading-relaxed text-transparent caret-transparent focus:outline-none"
+            placeholder=""
+          />
+        </div>
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-sm text-gray-400">{text.length} 字</span>
+          <button
+            type="button"
+            onClick={() => setText('')}
+            className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-500 hover:bg-gray-50"
+          >
+            清空
+          </button>
+        </div>
+      </div>
+
       <style jsx global>{`
-        .typewriter-area:focus {
-          outline: none;
-        }
         .typewriter-cursor::after {
           content: '|';
           animation: blink 1s step-end infinite;
@@ -299,31 +362,11 @@ function TypewriterMode() {
           50% { opacity: 0; }
         }
       `}</style>
-      <div className="w-full max-w-2xl">
-        <div className="mb-4 text-center">
-          <p className="text-sm text-gray-500">{t('writeSomething')}</p>
-        </div>
-        <div className="min-h-[400px] rounded-lg border-2 border-indigo-200 bg-white p-8 shadow-sm">
-          <p className="text-lg leading-relaxed text-gray-800">
-            <span>{text}</span>
-            <span className="typewriter-cursor" />
-          </p>
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="typewriter-area absolute left-0 top-0 h-full w-full resize-none bg-transparent p-8 text-lg leading-relaxed text-transparent caret-transparent"
-            placeholder=""
-            autoFocus
-          />
-        </div>
-        <div className="mt-3 text-right text-sm text-gray-400">
-          {text.length} 字
-        </div>
-      </div>
     </div>
   );
 }
 
+// ─── Free Writing ─────────────────────────────────────────────────
 function FreeWritingMode() {
   const t = useTranslations('WordFlow.focus');
   const [text, setText] = useState('');
@@ -331,21 +374,30 @@ function FreeWritingMode() {
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const clearTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => clearTimer, [clearTimer]);
+
   const startFreeWriting = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      setTimer((prev) => prev + 1);
-    }, 1000);
+    clearTimer();
+    intervalRef.current = setInterval(() => setTimer((p) => p + 1), 1000);
     setIsRunning(true);
   };
 
   const stopFreeWriting = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    clearTimer();
     setIsRunning(false);
   };
 
   const resetFreeWriting = () => {
-    stopFreeWriting();
+    clearTimer();
+    setIsRunning(false);
     setTimer(0);
     setText('');
   };
@@ -370,15 +422,15 @@ function FreeWritingMode() {
         <div className="mt-3 flex items-center justify-between">
           <div className="flex gap-2">
             {isRunning ? (
-              <button onClick={stopFreeWriting} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700">
+              <button type="button" onClick={stopFreeWriting} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700">
                 <Pause className="h-4 w-4" /> {t('pause')}
               </button>
             ) : (
-              <button onClick={startFreeWriting} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700">
+              <button type="button" onClick={startFreeWriting} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700">
                 <Play className="h-4 w-4" /> {timer > 0 ? t('resume') : t('start')}
               </button>
             )}
-            <button onClick={resetFreeWriting} className="flex items-center gap-1 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">
+            <button type="button" onClick={resetFreeWriting} className="flex items-center gap-1 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">
               <RotateCcw className="h-4 w-4" /> {t('reset')}
             </button>
           </div>

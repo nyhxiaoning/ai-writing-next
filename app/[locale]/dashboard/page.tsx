@@ -2,8 +2,9 @@
 
 import { useAuthStore } from '@/store/useAuthStore';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { PenSquare } from 'lucide-react';
 
 /**
  * 仪表板页面
@@ -11,6 +12,8 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 export default function Dashboard() {
   const { user, logout } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'zh';
   const t = useTranslations('Navigation');
   const tDash = useTranslations('Dashboard');
   const tCommon = useTranslations('Common');
@@ -89,12 +92,19 @@ export default function Dashboard() {
                         {tDash('systemNormal')}
                       </p>
                     </div>
-                    <div className="bg-white p-6 rounded-lg shadow">
+                    <div className="bg-white p-6 rounded-lg shadow flex flex-col items-center justify-center">
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        {tDash('quickActions')}
+                        码流写作台
                       </h3>
-                      <button className="text-blue-600 hover:text-blue-800">
-                        {tDash('viewSettings')}
+                      <p className="text-gray-500 text-sm mb-4 text-center">
+                        AI 网文专属写作平台
+                      </p>
+                      <button
+                        onClick={() => router.push(`/${locale}/wordflow`)}
+                        className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-lg hover:opacity-90 transition-opacity font-medium"
+                      >
+                        <PenSquare className="h-4 w-4" />
+                        进入写作台
                       </button>
                     </div>
                   </div>

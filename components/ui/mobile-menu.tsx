@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
+import { PenSquare } from 'lucide-react'
 
 export default function MobileMenu() {
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false)
@@ -150,12 +151,22 @@ export default function MobileMenu() {
                   </div>
                 </li>
                 <li>
-                  <Link 
-                    href={`/${currentLocale}/dashboard`} 
-                    className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" 
+                  <Link
+                    href={`/${currentLocale}/dashboard`}
+                    className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center"
                     onClick={() => setMobileNavOpen(false)}
                   >
                     {t('dashboard')}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={`/${currentLocale}/wordflow`}
+                    className="flex items-center justify-center gap-1.5 font-medium w-full text-blue-600 hover:text-blue-700 py-2"
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    <PenSquare className="h-4 w-4" />
+                    码流写作台
                   </Link>
                 </li>
                 <li>

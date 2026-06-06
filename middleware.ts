@@ -3,7 +3,7 @@ import createMiddleware from 'next-intl/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 
 // 需要认证的路径
-const protectedPaths = ['/dashboard', '/wordflow'];
+const protectedPaths = ['/dashboard'];
 
 // 认证相关路径
 const authPaths = ['/auth/signin', '/auth/signup', '/auth/reset-password'];

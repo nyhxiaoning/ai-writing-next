@@ -13,10 +13,12 @@ import { styled } from "@stitches/react";
 import styles from "./index.module.css";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { PenSquare } from "lucide-react";
 
 export default function Header() {
   const t = useTranslations("HomePage");
   const tCommon = useTranslations("Common");
+  const tNav = useTranslations("Navigation");
   const [top, setTop] = useState<boolean>(true);
   const pathname = usePathname();
 
@@ -131,6 +133,15 @@ export default function Header() {
                   className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
                 >
                   {tCommon("contact")}
+                </Link>
+              </li>
+              <li className="ml-2">
+                <Link
+                  href={`/${currentLocale}/wordflow`}
+                  className="flex items-center gap-1.5 font-medium text-blue-600 hover:text-blue-700 px-4 py-2 rounded-lg border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition duration-150 ease-in-out"
+                >
+                  <PenSquare className="h-4 w-4" />
+                  码流
                 </Link>
               </li>
               {/* <li className="ml-3">

@@ -53,7 +53,67 @@ const SYSTEM_PROMPTS: Record<string, string> = {
 - 指出重要的伏笔和悬念
 - 评估节奏和情感曲线
 - 如有建议改进之处可以附注`,
+
+  scriptReviewer: `你是一位专业的剧本审阅编辑。你的核心职责是审阅和分析剧本内容，然后根据用户选择的优化方向进行内容优化。
+
+## 审阅维度
+审阅时必须从以下三个维度进行分析：
+
+### 1. 角色一致性
+- 角色的言行是否符合其性格设定
+- 角色在不同场景中的表现是否一致
+- 角色的情感反应是否合理
+- 角色的成长弧光是否连贯
+
+### 2. 对话连贯性
+- 对话是否符合角色身份和关系
+- 对话之间的逻辑衔接是否自然
+- 对话是否推动剧情发展
+- 话题转换是否合理
+
+### 3. 对话趣味性
+- 对话是否有吸引力和张力
+- 是否有出人意料的反转或妙语
+- 幽默或情感元素是否自然融入
+- 节奏是否有变化，避免单调
+
+## 审阅报告格式
+每个维度的分析请按以下格式输出：
+【维度名称】
+- 评分：[1-10]/10
+- 优点：[列出2-3个优点]
+- 问题：[列出2-3个具体问题，引用原文]
+- 建议：[给出2-3条具体改进建议]
+
+最后给出总体评价和建议优先级。`,
 };
+
+// ─── Script reviewer special instructions ──────────────────────────
+
+const REVIEW_INSTRUCTION = `
+请对用户提供的剧本内容进行审阅分析。
+严格按照以下三个维度进行审阅：
+1. 角色一致性
+2. 对话连贯性
+3. 对话趣味性
+
+每个维度请给出评分、优点、具体问题和改进建议。
+最后给出总体评价和改进优先级。`;
+
+const OPTIMIZE_INSTRUCTION = `
+用户已经查阅了你的审阅报告，现在选择了特定的优化方向。
+请根据用户选择的优化方向，对原文进行改写优化。
+
+优化要求：
+- 仅修改与所选优化方向相关的内容，保持其他部分不变
+- 保持原文的核心情节和人物设定不变
+- 在修改处用【优化】标记标注
+- 输出完整优化后的内容
+- 在末尾附上修改说明，列出具体改了哪些地方
+
+用户选择的优化方向：{directions}
+审阅报告摘要：{reviewSummary}
+{targetWordCount}`;
 
 // ─── Derive prompts ────────────────────────────────────────────────
 
@@ -103,7 +163,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '未知工具类型' }, { status: 400 });
     }
 
-    const instruction = action === 'derive' ? DERIVE_INSTRUCTION : GENERATE_INSTRUCTION;
+    // Special handling for scriptReviewer
+    let instruction: string;
+    if (tool === 'scriptReviewer') {
+      if (action === 'derive') {
+        instruction = REVIEW_INSTRUCTION;
+      } else {
+        // generate — pass selected directions and review summary
+        const directions = restParams.directions || '未指定';
+        const reviewSummary = restParams.reviewSummary || '无审阅摘要';
+        const targetWordCount = restParams.targetWordCount
+          ? `目标字数：优化后的内容控制在 ${restParams.targetWordCount} 字左右。`
+          : '';
+        instruction = OPTIMIZE_INSTRUCTION
+          .replace('{directions}', directions as string)
+          .replace('{reviewSummary}', reviewSummary as string)
+          .replace('{targetWordCount}', targetWordCount as string);
+      }
+    } else {
+      instruction = action === 'derive' ? DERIVE_INSTRUCTION : GENERATE_INSTRUCTION;
+    }
 
     const contextBlock = context
       ? `\n\n当前作品的上下文信息：\n${Object.entries(context)

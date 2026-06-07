@@ -1,5 +1,10 @@
 # Free Tailwind landing page template
+# 增加两个功能
+## 灵感收集
+收集各种内容
 
+## 知识库
+汇总这篇小说或短文，引用的所有的资源整理，就和图书的引用一样；
 ![Simple TailwindCSS template preview](https://user-images.githubusercontent.com/2683512/231426766-72ae7bcd-618b-4a3e-87cd-b46a464bde61.png)
 
 **Simple Light** is a free landing page template built on top of **TailwindCSS** and fully coded in **React** / **Next.js**. Simple light is designed to provide all the basic components a developer need to create a landing page for SaaS products, online services, and more. 

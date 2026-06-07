@@ -37,6 +37,23 @@ export async function POST(request: NextRequest, { params }: { params: { bookId:
   }
 }
 
+export async function PUT(request: NextRequest, { params }: { params: { bookId: string } }) {
+  try {
+    const userPayload = getUserFromRequest(request);
+    if (!userPayload) return NextResponse.json({ error: '未授权访问' }, { status: 401 });
+
+    const { id, ...data } = await request.json();
+    await prisma.equipment.updateMany({
+      where: { id, bookId: params.bookId, book: { userId: userPayload.userId } },
+      data,
+    });
+    return NextResponse.json({ message: '已更新' });
+  } catch (error) {
+    console.error('更新装备错误:', error);
+    return NextResponse.json({ error: '服务器内部错误' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: NextRequest, { params }: { params: { bookId: string } }) {
   try {
     const userPayload = getUserFromRequest(request);

@@ -55,6 +55,30 @@ export async function POST(request: NextRequest, { params }: { params: { bookId:
   }
 }
 
+export async function PUT(request: NextRequest, { params }: { params: { bookId: string } }) {
+  try {
+    const userPayload = getUserFromRequest(request);
+    if (!userPayload) return NextResponse.json({ error: '未授权访问' }, { status: 401 });
+
+    const { id, title, content, nodeType } = await request.json();
+    if (!id) return NextResponse.json({ error: '缺少 ID' }, { status: 400 });
+
+    const updated = await prisma.outlineNode.updateMany({
+      where: { id, bookId: params.bookId, book: { userId: userPayload.userId } },
+      data: {
+        ...(title !== undefined && { title }),
+        ...(content !== undefined && { content }),
+        ...(nodeType !== undefined && { nodeType }),
+      },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('更新大纲节点错误:', error);
+    return NextResponse.json({ error: '服务器内部错误' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: NextRequest, { params }: { params: { bookId: string } }) {
   try {
     const userPayload = getUserFromRequest(request);

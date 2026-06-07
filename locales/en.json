@@ -379,6 +379,7 @@
             "genre_fantasy": "Fantasy",
             "genre_horror": "Horror",
             "genre_romance": "Romance",
+            "genre_life": "Life",
             "type_outline": "Outline",
             "type_character_setting": "Character Setting",
             "type_world_setting": "World Setting",

@@ -310,6 +310,7 @@ export default function StudioPage() {
           onReorder={handleReorder}
           onAdd={handleAddChapter}
           onDelete={handleDeleteChapter}
+          bookId={bookId}
         />
       </div>
 

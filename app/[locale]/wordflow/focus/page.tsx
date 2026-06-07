@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Play, Pause, RotateCcw, Volume2, VolumeX, Type, Edit3, Music, Square } from 'lucide-react';
+import { useFocusStore } from '@/store/useFocusStore';
 
 type Mode = 'pomodoro' | 'whiteNoise' | 'typewriter' | 'freeWriting';
 
@@ -57,6 +58,7 @@ function PomodoroTimer() {
   const [breakDuration, setBreakDuration] = useState(5);
   const [sessions, setSessions] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const focusStore = useFocusStore();
 
   const totalTime = (isBreak ? breakDuration : workDuration) * 60;
   const progress = 1 - timeLeft / totalTime;
@@ -72,22 +74,27 @@ function PomodoroTimer() {
 
   const startTimer = useCallback(() => {
     clearTimer();
+    focusStore.startFocus('pomodoro', isBreak ? t('break') : t('work'));
     intervalRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          setIsBreak((b) => !b);
+          const nextBreak = !isBreak;
+          // Update store on work/break transition
+          focusStore.startFocus('pomodoro', nextBreak ? t('break') : t('work'));
+          setIsBreak(nextBreak);
           setSessions((s) => s + (isBreak ? 0 : 1));
-          return isBreak ? workDuration * 60 : breakDuration * 60;
+          return nextBreak ? breakDuration * 60 : workDuration * 60;
         }
         return prev - 1;
       });
     }, 1000);
     setIsRunning(true);
-  }, [clearTimer, isBreak, workDuration, breakDuration]);
+  }, [clearTimer, isBreak, workDuration, breakDuration, focusStore, t]);
 
   const pauseTimer = () => {
     clearTimer();
     setIsRunning(false);
+    focusStore.stopFocus();
   };
 
   const resetTimer = () => {
@@ -95,6 +102,7 @@ function PomodoroTimer() {
     setIsRunning(false);
     setIsBreak(false);
     setTimeLeft(workDuration * 60);
+    focusStore.stopFocus();
   };
 
   // Cleanup on unmount
@@ -187,81 +195,11 @@ function PomodoroTimer() {
 // ─── White Noise ─────────────────────────────────────────────────
 function WhiteNoisePlayer() {
   const t = useTranslations('WordFlow.focus');
-  const [active, setActive] = useState<string | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const { whiteNoiseType, setWhiteNoise } = useFocusStore();
 
-  const stopNoise = useCallback(() => {
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-      sourceRef.current = null;
-    }
-    setActive(null);
-  }, []);
-
-  // Cleanup AudioContext on unmount
-  useEffect(() => {
-    return () => {
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-        audioContextRef.current = null;
-        sourceRef.current = null;
-      }
-    };
-  }, []);
-
-  const playNoise = (type: string) => {
-    // If clicking the already-playing type, stop it
-    if (active === type) {
-      stopNoise();
-      return;
-    }
-
-    // Stop previous noise
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-    }
-
-    const ctx = new AudioContext();
-    audioContextRef.current = ctx;
-
-    const bufferSize = ctx.sampleRate * 2;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-
-    for (let i = 0; i < bufferSize; i++) {
-      let sample: number;
-      switch (type) {
-        case 'rain':
-          sample = Math.random() * 2 - 1;
-          break;
-        case 'cafe':
-          sample = (Math.random() + Math.random() + Math.random()) / 3 * 2 - 1;
-          break;
-        case 'forest':
-          sample = Math.sin(i * 0.01) * 0.3 + (Math.random() * 2 - 1) * 0.5;
-          break;
-        case 'deepspace':
-        default:
-          sample = Math.random() * 2 - 1;
-      }
-      data[i] = sample * 0.3;
-    }
-
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = true;
-
-    const gain = ctx.createGain();
-    gain.gain.value = 0.3;
-
-    source.connect(gain);
-    gain.connect(ctx.destination);
-    source.start();
-
-    sourceRef.current = source;
-    setActive(type);
+  const handleToggle = (type: string) => {
+    // If clicking the already-playing type, stop it. Otherwise switch.
+    setWhiteNoise(whiteNoiseType === type ? null : type);
   };
 
   const noises = [
@@ -276,11 +214,11 @@ function WhiteNoisePlayer() {
       <h3 className="mb-6 text-lg font-medium text-gray-900">{t('selectNoise')}</h3>
 
       {/* Active indicator + stop button */}
-      {active && (
+      {whiteNoiseType && (
         <div className="mb-4 flex items-center gap-3 rounded-full bg-indigo-50 px-4 py-2 text-sm text-indigo-700">
           <Volume2 className="h-4 w-4" />
           正在播放
-          <button type="button" onClick={stopNoise} className="ml-2 flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-xs text-red-600 hover:bg-red-200">
+          <button type="button" onClick={() => setWhiteNoise(null)} className="ml-2 flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-xs text-red-600 hover:bg-red-200">
             <Square className="h-3 w-3" /> 停止
           </button>
         </div>
@@ -291,16 +229,16 @@ function WhiteNoisePlayer() {
           <button
             key={noise.key}
             type="button"
-            onClick={() => playNoise(noise.key)}
+            onClick={() => handleToggle(noise.key)}
             className={`flex flex-col items-center gap-2 rounded-xl border-2 p-8 transition-all ${
-              active === noise.key
+              whiteNoiseType === noise.key
                 ? 'border-indigo-500 bg-indigo-50 shadow-md'
                 : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
             }`}
           >
             <span className="text-4xl">{noise.icon}</span>
             <span className="font-medium text-gray-700">{noise.label}</span>
-            {active === noise.key && (
+            {whiteNoiseType === noise.key && (
               <span className="flex items-center gap-1 text-xs text-indigo-600">
                 <Volume2 className="h-3 w-3" /> 播放中
               </span>
@@ -373,6 +311,7 @@ function FreeWritingMode() {
   const [timer, setTimer] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const focusStore = useFocusStore();
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current) {
@@ -386,17 +325,20 @@ function FreeWritingMode() {
 
   const startFreeWriting = () => {
     clearTimer();
+    focusStore.startFocus('freeWriting', t('freeWriting'));
     intervalRef.current = setInterval(() => setTimer((p) => p + 1), 1000);
     setIsRunning(true);
   };
 
   const stopFreeWriting = () => {
     clearTimer();
+    focusStore.stopFocus();
     setIsRunning(false);
   };
 
   const resetFreeWriting = () => {
     clearTimer();
+    focusStore.stopFocus();
     setIsRunning(false);
     setTimer(0);
     setText('');

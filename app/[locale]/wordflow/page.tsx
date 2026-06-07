@@ -46,6 +46,7 @@ export default function WordFlowDashboard() {
   const [syncingBooks, setSyncingBooks] = useState<Record<string, 'push' | 'pull' | null>>({});
   const [syncMessages, setSyncMessages] = useState<Record<string, string>>({});
   const [syncModalBookId, setSyncModalBookId] = useState<string | null>(null);
+  const [totalWords, setTotalWords] = useState(0);
 
   useEffect(() => {
     // Validate auth on mount
@@ -80,6 +81,7 @@ export default function WordFlowDashboard() {
       if (res.ok) {
         const data = await res.json();
         setBooks(data.books || []);
+        setTotalWords(data.totalWords ?? 0);
         // Fetch sync configs for all books
         if (data.books?.length > 0) {
           fetchSyncConfigs(data.books);
@@ -244,7 +246,6 @@ export default function WordFlowDashboard() {
     }
   };
 
-  const totalWords = 0;
   const ongoingBooks = books.filter((b) => b.status === 'ongoing').length;
 
   // Show loading while checking auth

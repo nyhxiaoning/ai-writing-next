@@ -16,12 +16,17 @@ export async function GET(request: NextRequest) {
       where: { userId: userPayload.userId },
       include: {
         _count: { select: { chapters: true } },
+        chapters: { select: { wordCount: true } },
       },
       orderBy: { updatedAt: 'desc' },
     });
 
-    return NextResponse.json({
-      books: books.map((b) => ({
+    // Calculate total word count across all books
+    let totalWords = 0;
+    const booksData = books.map((b) => {
+      const bookTotalWords = b.chapters.reduce((sum, ch) => sum + ch.wordCount, 0);
+      totalWords += bookTotalWords;
+      return {
         id: b.id,
         title: b.title,
         genre: b.genre,
@@ -29,9 +34,15 @@ export async function GET(request: NextRequest) {
         wordGoal: b.wordGoal,
         status: b.status,
         chapterCount: b._count.chapters,
+        totalWordCount: bookTotalWords,
         createdAt: b.createdAt.toISOString(),
         updatedAt: b.updatedAt.toISOString(),
-      })),
+      };
+    });
+
+    return NextResponse.json({
+      books: booksData,
+      totalWords,
     });
   } catch (error) {
     console.error('获取书籍列表错误:', error);

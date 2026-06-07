@@ -4,6 +4,8 @@ import { ReactNode } from 'react';
 import WordFlowSidebar from '@/components/wordflow/WordFlowSidebar';
 import WordFlowTopNav from '@/components/wordflow/WordFlowTopNav';
 import AIChatDialog from '@/components/wordflow/AIChatDialog';
+import FocusIndicator from '@/components/wordflow/FocusIndicator';
+import WhiteNoiseEngine from '@/components/wordflow/WhiteNoiseEngine';
 
 export default function WordFlowLayout({ children }: { children: ReactNode }) {
   return (
@@ -17,6 +19,10 @@ export default function WordFlowLayout({ children }: { children: ReactNode }) {
       </div>
       {/* Global AI Chat Dialog — available on all WordFlow pages */}
       <AIChatDialog />
+      {/* Focus mode indicator — shown when a focus task is running */}
+      <FocusIndicator />
+      {/* White noise audio engine — persists across page navigation */}
+      <WhiteNoiseEngine />
     </div>
   );
 }

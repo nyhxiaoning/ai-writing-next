@@ -117,3 +117,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '服务器错误' }, { status: 500 });
   }
 }
+
+// DELETE — delete a chat session and all its messages
+export async function DELETE(request: NextRequest) {
+  try {
+    const user = getUserFromRequest(request);
+    if (!user) return NextResponse.json({ error: '未授权' }, { status: 401 });
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: '缺少会话 ID' }, { status: 400 });
+
+    await prisma.aiChatSession.deleteMany({
+      where: { id, userId: user.userId },
+    });
+
+    return NextResponse.json({ message: '已删除' });
+  } catch (e) {
+    console.error('删除会话错误:', e);
+    return NextResponse.json({ error: '服务器错误' }, { status: 500 });
+  }
+}

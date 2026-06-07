@@ -10,7 +10,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import {
   Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Heading1, Heading2,
-  Heading3, Undo, Redo, Copy, ClipboardPaste, Check, Code2, Eye, FileCode,
+  Heading3, Undo, Redo, Copy, ClipboardPaste, Check, Code2, Eye, FileCode, ListTree,
 } from 'lucide-react';
 
 // ─── ProseMirror 基础样式 ───────────────────────────────────────
@@ -100,10 +100,74 @@ function ToolbarButton({
   );
 }
 
+// ─── Table of Contents ──────────────────────────────────────────
+function TocPanel({ editor, onClose }: { editor: any; onClose: () => void }) {
+  const headings: { level: number; text: string; pos: number }[] = [];
+  const doc = editor.getJSON();
+  if (doc?.content) {
+    let pos = 0;
+    doc.content.forEach((node: any) => {
+      if (node.type === 'heading') {
+        headings.push({ level: node.attrs?.level || 1, text: node.content?.map((c: any) => c.text).join('') || '', pos });
+      }
+      pos += 1;
+    });
+  }
+
+  const goToHeading = (index: number) => {
+    editor.commands.focus();
+    // Find the heading node position in the editor
+    let count = 0;
+    editor.state.doc.descendants((node: any, p: number) => {
+      if (node.type.name === 'heading') {
+        if (count === index) {
+          editor.commands.setTextSelection({ from: p, to: p + node.nodeSize });
+          editor.commands.scrollIntoView();
+          return false;
+        }
+        count++;
+      }
+    });
+    onClose();
+  };
+
+  if (headings.length === 0) {
+    return (
+      <div className="border-b border-gray-200 bg-gray-50 px-4 py-3">
+        <p className="text-xs text-gray-400">当前文档无标题，使用 H1/H2/H3 添加标题后自动生成目录</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border-b border-gray-200 bg-gray-50 px-4 py-3">
+      <div className="mb-1 flex items-center justify-between">
+        <span className="text-xs font-medium text-gray-600">文档目录</span>
+        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600">关闭</button>
+      </div>
+      <div className="space-y-0.5">
+        {headings.map((h, i) => (
+          <button
+            key={i}
+            onClick={() => goToHeading(i)}
+            className={`block w-full rounded px-2 py-1 text-left text-xs hover:bg-blue-100 transition-colors ${
+              h.level === 1 ? 'font-medium text-gray-800' : h.level === 2 ? 'text-gray-600' : 'text-gray-500'
+            }`}
+            style={{ paddingLeft: `${8 + (h.level - 1) * 12}px` }}
+          >
+            {h.text || '(空标题)'}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ChapterEditor({ content, onChange, placeholder, limit }: ChapterEditorProps) {
   const [copied, setCopied] = useState<'html' | 'text' | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('edit');
   const [sourceHtml, setSourceHtml] = useState(content);
+  const [showToc, setShowToc] = useState(false);
   const sourceTextareaRef = useRef<HTMLTextAreaElement>(null);
   // 标记内容变化是否来自编辑器自身（避免回写导致光标跳转）
   const isEditorUpdate = useRef(false);
@@ -277,7 +341,17 @@ export default function ChapterEditor({ content, onChange, placeholder, limit }:
         <ToolbarButton onClick={copyText} title="复制纯文本">
           {copied === 'text' ? <Check className="h-4 w-4 text-green-500" /> : <ClipboardPaste className="h-4 w-4" />}
         </ToolbarButton>
+
+        <span className="mx-1 h-5 w-px bg-gray-200" />
+        <ToolbarButton onClick={() => setShowToc(!showToc)} active={showToc} title="文档目录">
+          <ListTree className="h-4 w-4" />
+        </ToolbarButton>
       </div>
+
+      {/* TOC panel */}
+      {showToc && viewMode === 'edit' && editor && (
+        <TocPanel editor={editor} onClose={() => setShowToc(false)} />
+      )}
 
       {/* Editor / Source / Preview content */}
       <div className="relative">

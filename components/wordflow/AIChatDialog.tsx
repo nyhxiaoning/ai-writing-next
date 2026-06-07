@@ -192,18 +192,35 @@ export default function AIChatDialog({ bookId }: { bookId?: string }) {
           {/* Session bar */}
           {!showConfig && (
             <div className="flex items-center gap-1 border-b bg-gray-50 px-3 py-1.5">
-              <button onClick={newSession} className={`rounded px-2 py-1 text-xs ${!activeSessionId ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-200'}`}>
+              <button onClick={newSession} className={`rounded px-2 py-1 text-xs whitespace-nowrap ${!activeSessionId ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-200'}`}>
                 新对话
               </button>
-              {sessions.slice(0, 5).map((s) => (
+              {sessions.slice(0, 4).map((s) => (
                 <button
                   key={s.id}
                   onClick={() => { setActiveSessionId(s.id); loadMessages(s.id); }}
-                  className={`max-w-[100px] truncate rounded px-2 py-1 text-xs ${activeSessionId === s.id ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-200'}`}
+                  className={`max-w-[90px] truncate rounded px-2 py-1 text-xs ${activeSessionId === s.id ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-200'}`}
                 >
                   {s.title || '对话'}
                 </button>
               ))}
+              {activeSessionId && (
+                <button
+                  onClick={async () => {
+                    if (!confirm('确定删除当前对话？')) return;
+                    try {
+                      await fetch(`/api/wordflow/ai/chat?id=${activeSessionId}`, { method: 'DELETE' });
+                      setActiveSessionId(null);
+                      setMessages([]);
+                      loadSessions();
+                    } catch {}
+                  }}
+                  className="ml-auto rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-500"
+                  title="删除当前对话"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
           )}
 

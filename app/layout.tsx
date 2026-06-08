@@ -1,12 +1,21 @@
-// 这个文件只是为了兼容性，实际的布局在 [locale]/layout.tsx 中
+import { Inter } from 'next/font/google';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+// This file is the root layout required by Next.js.
+// Actual page layout is in [locale]/layout.tsx
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html>
-      <body>
+    <html lang="zh">
+      <body className={`${inter.variable} font-inter antialiased bg-white text-gray-900 tracking-tight`}>
         {children}
       </body>
     </html>

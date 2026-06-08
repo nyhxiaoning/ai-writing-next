@@ -1,15 +1,9 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, unstable_setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { Inter } from 'next/font/google';
 import { locales } from '@/i18n';
+import ClientLayout from '@/components/ClientLayout';
 import '../css/style.css';
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -34,16 +28,10 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body
-        className={`${inter.variable} font-inter antialiased bg-white text-gray-900 tracking-tight`}
-      >
-        <NextIntlClientProvider messages={messages}>
-          <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
-            {children}
-          </div>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <div className="flex flex-col min-h-screen overflow-hidden supports-[overflow:clip]:overflow-clip">
+        <ClientLayout>{children}</ClientLayout>
+      </div>
+    </NextIntlClientProvider>
   );
 }

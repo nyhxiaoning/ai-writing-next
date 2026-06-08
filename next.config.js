@@ -12,6 +12,10 @@ const nextConfig = {
     },
     // 移除 trailingSlash，可能与国际化路由冲突
     // trailingSlash: true,
+    // 每次构建生成唯一 ID，避免 Vercel 缓存污染
+    generateBuildId: async () => {
+        return `build-${Date.now()}`;
+    },
 }
 
 module.exports = withNextIntl(nextConfig);

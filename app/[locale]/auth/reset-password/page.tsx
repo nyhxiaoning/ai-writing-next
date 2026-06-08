@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -8,9 +8,9 @@ import { useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 /**
- * 重置密码页面
+ * 重置密码页面内容
  */
-export default function ResetPassword() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const { requestPasswordReset, confirmPasswordReset, isLoading } = useAuthStore();
@@ -249,5 +249,16 @@ export default function ResetPassword() {
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * 重置密码页面（使用 Suspense 包裹 useSearchParams）
+ */
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-500">Loading...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

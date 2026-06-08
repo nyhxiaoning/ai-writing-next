@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, generateToken, isValidEmail, isValidPassword } from '@/lib/auth';
+import { getWhitelistAccount } from '@/lib/whitelist';
 import { sendWelcomeEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
@@ -47,6 +48,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: '该邮箱已被注册' },
         { status: 409 }
+      );
+    }
+
+    // 白名单邮箱不允许外部注册
+    if (getWhitelistAccount(email)) {
+      return NextResponse.json(
+        { error: '该邮箱已被系统保留' },
+        { status: 403 }
       );
     }
 

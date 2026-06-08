@@ -17,9 +17,8 @@ export function isPathWhitelisted(pathname: string): boolean {
 
 /**
  * 检查请求是否允许以访客身份访问
- * 当前策略：白名单内的 GET 请求允许访客访问
+ * 当前策略：白名单内的所有请求均允许访客访问
  */
 export function isGuestAllowed(pathname: string, method: string): boolean {
-  if (method !== 'GET') return false;
   return isPathWhitelisted(pathname);
 }

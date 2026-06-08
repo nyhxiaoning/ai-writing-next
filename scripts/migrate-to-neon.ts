@@ -141,7 +141,7 @@ async function loadToPostgres() {
       for (const row of rows) {
         const modelName = name.charAt(0).toLowerCase() + name.slice(1)
         try {
-          ;(prisma as any)[modelName].create({ data: row })
+          await (prisma as any)[modelName].create({ data: row })
         } catch (err) {
           console.error(`  ${name}: 插入失败 id=${row.id}`, err instanceof Error ? err.message : err)
         }

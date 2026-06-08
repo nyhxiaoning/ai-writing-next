@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
+import { isGuestAllowed } from './whitelist';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -39,15 +40,22 @@ export function verifyToken(token: string): any {
 
 /**
  * 从请求中获取用户信息
+ * 如果请求在白名单内且为 GET 方法，返回访客用户信息
  */
 export function getUserFromRequest(request: NextRequest): any {
   const token = request.cookies.get('auth-token')?.value;
-  
-  if (!token) {
-    return null;
+
+  if (token) {
+    const payload = verifyToken(token);
+    if (payload) return payload;
   }
-  
-  return verifyToken(token);
+
+  // 检查白名单：允许访客以只读模式访问
+  if (isGuestAllowed(request.nextUrl.pathname, request.method)) {
+    return { userId: -1, isGuest: true };
+  }
+
+  return null;
 }
 
 /**

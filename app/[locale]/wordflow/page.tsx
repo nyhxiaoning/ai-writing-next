@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/useAuthStore';
-import { Book, Plus, BookOpen, FileText, TrendingUp, LogIn, Upload, Download, Loader2, Settings } from 'lucide-react';
+import { Book, Plus, BookOpen, FileText, TrendingUp, Upload, Download, Loader2, Settings } from 'lucide-react';
 import Link from 'next/link';
 import GitHubSyncModal from '@/components/wordflow/GitHubSyncModal';
 
@@ -32,13 +31,9 @@ export default function WordFlowDashboard() {
   const t = useTranslations('WordFlow');
   const bt = useTranslations('WordFlow.books');
   const router = useRouter();
-  const user = useAuthStore((s) => s.user);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const checkAuth = useAuthStore((s) => s.checkAuth);
   const locale = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : 'zh';
   const [books, setBooks] = useState<BookData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState<{ title: string; genre: string; description: string; wordGoal: string; otherGenre: string }>({ title: '', genre: '', description: '', wordGoal: '', otherGenre: '' });
   const [error, setError] = useState('');
@@ -49,26 +44,11 @@ export default function WordFlowDashboard() {
   const [totalWords, setTotalWords] = useState(0);
 
   useEffect(() => {
-    // Validate auth on mount
-    const init = async () => {
-      if (!isAuthenticated) {
-        await checkAuth();
-      }
-      setAuthChecked(true);
-    };
-    init();
+    fetchBooks();
   }, []);
 
-  useEffect(() => {
-    if (authChecked) {
-      fetchBooks();
-    }
-  }, [authChecked]);
-
   const handle401 = () => {
-    // Auth expired or invalid – redirect to sign in
-    const locale = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : 'zh';
-    router.push(`/${locale}/auth/signin`);
+    setLoading(false);
   };
 
   const fetchBooks = async () => {
@@ -247,44 +227,6 @@ export default function WordFlowDashboard() {
   };
 
   const ongoingBooks = books.filter((b) => b.status === 'ongoing').length;
-
-  // Show loading while checking auth
-  if (!authChecked) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-      </div>
-    );
-  }
-
-  // If not authenticated after check, show login prompt
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center py-32">
-        <Book className="mb-6 h-16 w-16 text-gray-300" />
-        <h2 className="mb-2 text-xl font-semibold text-gray-700">登录后开始创作</h2>
-        <p className="mb-8 text-sm text-gray-500">请先登录或注册账号，使用写作台的所有功能</p>
-        <div className="flex gap-4">
-          <Link
-            href={`/${locale}/auth/signin`}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            <LogIn className="h-4 w-4" />
-            登录
-          </Link>
-          <Link
-            href={`/${locale}/auth/signup`}
-            className="flex items-center gap-2 rounded-lg border border-gray-300 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            注册
-          </Link>
-        </div>
-        <p className="mt-8 text-xs text-gray-400">
-          内置演示账号: <code className="bg-gray-100 px-2 py-0.5 rounded">demo@wordflow.app</code> / <code className="bg-gray-100 px-2 py-0.5 rounded">demo1234</code>
-        </p>
-      </div>
-    );
-  }
 
   if (loading) {
     return (

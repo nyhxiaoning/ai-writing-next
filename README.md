@@ -5,6 +5,32 @@
 
 ## 知识库
 汇总这篇小说或短文，引用的所有的资源整理，就和图书的引用一样；
+
+
+## vercel不支持sqlite，但是支持在线postgres
+
+- Neon 注册和设置指南，支持Vercel
+请按以下步骤操作：
+1. 注册 Neon
+* 打开 https://neon.tech
+* 点击 Sign Up，用 GitHub 或邮箱注册
+* 免费套餐包含 500MB 数据、无限分支
+2. 创建项目
+* 登录后点击 Create Project
+* 项目名：wordflow（或任意）
+* Region：选 Tokyo (ap-northeast-1) 或 Singapore (ap-southeast-1)（离国内近）
+* 点击 Create Project
+
+npm run dev
+登录 15600705234@163.com / 1234qwer，确认之前的作品和模板都在，然后创建一个新作品看看是否正常工作。
+7. 部署到 Vercel
+* 在 Vercel 项目 Dashboard → Settings → Environment Variables
+* 添加 DATABASE_URL，值为 Neon 连接串
+* 重新部署
+
+
+
+
 ![Simple TailwindCSS template preview](https://user-images.githubusercontent.com/2683512/231426766-72ae7bcd-618b-4a3e-87cd-b46a464bde61.png)
 
 **Simple Light** is a free landing page template built on top of **TailwindCSS** and fully coded in **React** / **Next.js**. Simple light is designed to provide all the basic components a developer need to create a landing page for SaaS products, online services, and more. 

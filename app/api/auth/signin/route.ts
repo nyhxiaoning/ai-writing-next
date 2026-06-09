@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { verifyPassword, generateToken, isValidEmail } from '@/lib/auth';
+import { verifyPassword, generateToken, isValidEmail, hashPassword } from '@/lib/auth';
+import { getWhitelistAccount } from '@/lib/whitelist';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,16 +37,54 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    if (!user) {
-      return NextResponse.json(
-        { error: '邮箱或密码错误' },
-        { status: 401 }
-      );
+    // 检查白名单
+    const whitelistAccount = getWhitelistAccount(email);
+
+    let authenticatedUser = user;
+    let isPasswordValid = false;
+
+    if (user) {
+      // 用户已存在，尝试验证密码
+      isPasswordValid = await verifyPassword(password, user.password);
+
+      // 如果密码不匹配，尝试用白名单密码验证
+      if (!isPasswordValid && whitelistAccount) {
+        isPasswordValid = password === whitelistAccount.password;
+        // 如果白名单密码匹配，更新数据库密码
+        if (isPasswordValid) {
+          const hashedPassword = await hashPassword(password);
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { password: hashedPassword },
+          });
+        }
+      }
+    } else if (whitelistAccount) {
+      // 用户不存在但在白名单中，自动创建
+      isPasswordValid = password === whitelistAccount.password;
+      if (isPasswordValid) {
+        const hashedPassword = await hashPassword(password);
+        authenticatedUser = await prisma.user.create({
+          data: {
+            email,
+            name: whitelistAccount.name || email.split('@')[0],
+            password: hashedPassword,
+            emailVerified: true,
+            emailVerifiedAt: new Date(),
+          },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            password: true,
+            avatar: true,
+            emailVerified: true,
+          },
+        });
+      }
     }
 
-    // 验证密码
-    const isPasswordValid = await verifyPassword(password, user.password);
-    if (!isPasswordValid) {
+    if (!authenticatedUser || !isPasswordValid) {
       return NextResponse.json(
         { error: '邮箱或密码错误' },
         { status: 401 }
@@ -54,9 +93,9 @@ export async function POST(request: NextRequest) {
 
     // 生成 JWT Token
     const tokenPayload = {
-      userId: user.id,
-      email: user.email,
-      name: user.name,
+      userId: authenticatedUser.id,
+      email: authenticatedUser.email,
+      name: authenticatedUser.name,
     };
 
     const token = generateToken(tokenPayload);
@@ -65,11 +104,11 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       message: '登录成功',
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        avatar: user.avatar,
-        emailVerified: user.emailVerified,
+        id: authenticatedUser.id,
+        email: authenticatedUser.email,
+        name: authenticatedUser.name,
+        avatar: authenticatedUser.avatar,
+        emailVerified: authenticatedUser.emailVerified,
       },
     });
 

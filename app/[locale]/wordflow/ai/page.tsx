@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Sparkles, Copy, Wand2, Type, FileText, Sun, BookOpen,
-  Lightbulb, ChevronDown, Loader2, AlertCircle,
+  Lightbulb, ChevronDown, Loader2, AlertCircle, ClipboardCheck,
+  CheckCircle2, XCircle, ArrowRight,
 } from 'lucide-react';
 
 // ─── Types ─────────────────────────────────────────────────────────
@@ -200,6 +201,19 @@ const TOOLS: ToolConfig[] = [
       },
     ],
   },
+  {
+    key: 'scriptReviewer',
+    icon: ClipboardCheck,
+    color: 'text-red-600',
+    bgColor: 'bg-red-50 border-red-200',
+    label: '剧情审阅器',
+    params: [
+      {
+        key: 'prompt', label: '剧本内容', type: 'textarea',
+        placeholder: '粘贴或写入需要审阅的剧本内容…',
+      },
+    ],
+  },
 ];
 
 // ─── Page ──────────────────────────────────────────────────────────
@@ -217,6 +231,12 @@ export default function AIPage() {
   const [result, setResult] = useState('');
   const [showDerivation, setShowDerivation] = useState(true);
   const [error, setError] = useState('');
+  // Reviewer-specific state
+  const [selectedDirections, setSelectedDirections] = useState<string[]>([]);
+  const [reviewResult, setReviewResult] = useState('');
+  const [optimizedContent, setOptimizedContent] = useState('');
+  const [reviewStep, setReviewStep] = useState<'input' | 'review' | 'optimized'>('input');
+  const [targetWordCount, setTargetWordCount] = useState('');
 
   const tool = TOOLS.find((t) => t.key === selectedTool)!;
 
@@ -243,6 +263,11 @@ export default function AIPage() {
     setResult('');
     setAction('idle');
     setError('');
+    setSelectedDirections([]);
+    setReviewResult('');
+    setOptimizedContent('');
+    setReviewStep('input');
+    setTargetWordCount('');
     // Initialize param defaults
     if (tool) {
       const defaults: Record<string, string> = {};
@@ -281,13 +306,18 @@ export default function AIPage() {
     if (selectedBookId) loadBookContext(selectedBookId);
   }, [selectedBookId, loadBookContext]);
 
-  const callTool = async (actionType: 'derive' | 'generate') => {
+  const callTool = async (actionType: 'derive' | 'generate', extraParams?: Record<string, any>) => {
     const prompt = paramValues['prompt']?.trim();
     if (!prompt) return;
 
     setLoading(true);
     setError('');
     setAction(actionType);
+
+    // For reviewer optimize, pass directions and review summary
+    const mergedParams = extraParams
+      ? { ...paramValues, ...extraParams }
+      : paramValues;
 
     try {
       const res = await fetch('/api/wordflow/ai/tools', {
@@ -297,7 +327,7 @@ export default function AIPage() {
           bookId: selectedBookId || undefined,
           tool: selectedTool,
           action: actionType,
-          params: paramValues,
+          params: mergedParams,
           context: selectedBookId ? bookContext : undefined,
         }),
       });
@@ -308,11 +338,20 @@ export default function AIPage() {
       }
 
       const data = await res.json();
-      if (actionType === 'derive') {
-        setDerivation(data.result);
-        setShowDerivation(true);
+
+      if (selectedTool === 'scriptReviewer') {
+        if (actionType === 'derive') {
+          setReviewResult(data.result);
+        } else {
+          setOptimizedContent(data.result);
+        }
       } else {
-        setResult(data.result);
+        if (actionType === 'derive') {
+          setDerivation(data.result);
+          setShowDerivation(true);
+        } else {
+          setResult(data.result);
+        }
       }
     } catch (e: any) {
       setError(e.message || '请求失败，请检查 AI 配置');
@@ -321,8 +360,30 @@ export default function AIPage() {
     }
   };
 
+  const handleReviewerOptimize = async () => {
+    if (selectedDirections.length === 0) {
+      setError('请至少选择一个优化方向');
+      return;
+    }
+    const directionLabels: Record<string, string> = {
+      consistency: '角色一致性优化',
+      coherence: '对话连贯性优化',
+      interest: '对话趣味性增强',
+      emotion: '情感表达丰富化',
+      rhythm: '节奏感优化',
+      imagery: '画面感增强',
+    };
+    const directionsText = selectedDirections.map((d) => directionLabels[d] || d).join('、');
+    await callTool('generate', {
+      directions: directionsText,
+      reviewSummary: reviewResult,
+      targetWordCount: targetWordCount || undefined,
+    });
+    setReviewStep('optimized');
+  };
+
   const copyResult = () => {
-    navigator.clipboard.writeText(result);
+    navigator.clipboard.writeText(result || optimizedContent);
   };
 
   const currentTool = TOOLS.find((t) => t.key === selectedTool) || TOOLS[0];
@@ -402,132 +463,279 @@ export default function AIPage() {
         </div>
       )}
 
-      {/* Parameters + Actions */}
-      <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-        {/* Parameters */}
-        <div className="mb-5 space-y-4">
-          {currentTool.params.map((param) => (
-            <div key={param.key}>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                {param.label}
-              </label>
-              {param.type === 'textarea' ? (
-                <textarea
-                  value={paramValues[param.key] || ''}
-                  onChange={(e) => setParamValues({ ...paramValues, [param.key]: e.target.value })}
-                  placeholder={param.placeholder}
-                  rows={3}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20 resize-y min-h-[60px]"
-                />
-              ) : param.type === 'select' ? (
-                <select
-                  value={paramValues[param.key] || ''}
-                  onChange={(e) => setParamValues({ ...paramValues, [param.key]: e.target.value })}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none bg-white"
-                >
-                  {param.options?.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type="text"
-                  value={paramValues[param.key] || ''}
-                  onChange={(e) => setParamValues({ ...paramValues, [param.key]: e.target.value })}
-                  placeholder={param.placeholder}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                />
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Derive button */}
-          <button
-            onClick={() => callTool('derive')}
-            disabled={loading || !paramValues['prompt']?.trim()}
-            className="flex items-center gap-2 rounded-lg border-2 border-amber-300 bg-amber-50 px-5 py-2.5 text-sm font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50 transition-colors"
-          >
-            {loading && action === 'derive' ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Lightbulb className="h-4 w-4" />
-            )}
-            推导分析
-            <span className="text-[10px] text-amber-500 font-normal">先分析再生成</span>
-          </button>
-
-          {/* Generate button */}
-          <button
-            onClick={() => callTool('generate')}
-            disabled={loading || !paramValues['prompt']?.trim()}
-            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-2.5 text-sm font-medium text-white shadow-md hover:opacity-90 disabled:opacity-50 transition-opacity"
-          >
-            {loading && action === 'generate' ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Wand2 className="h-4 w-4" />
-            )}
-            开始生成
-          </button>
-        </div>
-      </div>
-
-      {/* Derivation result (collapsible) */}
-      {derivation && (
-        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 shadow-sm">
-          <button
-            onClick={() => setShowDerivation(!showDerivation)}
-            className="flex w-full items-center justify-between"
-          >
-            <div className="flex items-center gap-2">
-              <Lightbulb className="h-4 w-4 text-amber-600" />
-              <h3 className="text-sm font-medium text-amber-800">推导分析结果</h3>
-            </div>
-            <ChevronDown
-              className={`h-4 w-4 text-amber-500 transition-transform ${
-                showDerivation ? 'rotate-0' : '-rotate-90'
-              }`}
+      {/* ── Script Reviewer UI ── */}
+      {selectedTool === 'scriptReviewer' ? (
+        <div className="space-y-4">
+          {/* Content input */}
+          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">剧本内容</label>
+            <textarea
+              value={paramValues['prompt'] || ''}
+              onChange={(e) => setParamValues({ ...paramValues, prompt: e.target.value })}
+              placeholder="粘贴或写入需要审阅的剧本内容，包括角色对话、场景描述等…"
+              rows={8}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500/20 resize-y"
             />
-          </button>
-          {showDerivation && (
-            <div className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-amber-900">
-              {derivation}
+            <div className="mt-3">
+              <button
+                onClick={() => { callTool('derive'); setReviewStep('review'); }}
+                disabled={loading || !paramValues['prompt']?.trim()}
+                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-orange-500 px-6 py-2.5 text-sm font-medium text-white shadow-md hover:opacity-90 disabled:opacity-50 transition-opacity"
+              >
+                {loading && action === 'derive' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ClipboardCheck className="h-4 w-4" />
+                )}
+                开始审阅
+              </button>
             </div>
-          )}
-        </div>
-      )}
-
-      {/* Final result */}
-      {result && (
-        <div className="mt-4 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Wand2 className="h-4 w-4 text-blue-600" />
-              <h3 className="text-sm font-medium text-gray-700">生成结果</h3>
-            </div>
-            <button
-              onClick={copyResult}
-              className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500 hover:border-blue-300 hover:text-blue-600 transition-colors"
-            >
-              <Copy className="h-3.5 w-3.5" /> 复制结果
-            </button>
           </div>
-          {loading && action === 'generate' && !result ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="flex flex-col items-center gap-2">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-                <span className="text-sm text-gray-400">AI 正在生成中…</span>
+
+          {/* Review result */}
+          {reviewResult && (
+            <div className="rounded-lg border border-red-200 bg-white p-5 shadow-sm">
+              <div className="mb-3 flex items-center gap-2">
+                <ClipboardCheck className="h-5 w-5 text-red-600" />
+                <h3 className="text-base font-semibold text-gray-900">审阅报告</h3>
+              </div>
+              <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-800">
+                {reviewResult}
               </div>
             </div>
-          ) : (
-            <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-800">
-              {result}
+          )}
+
+          {/* Optimization directions (show after review) */}
+          {reviewResult && reviewStep === 'review' && (
+            <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="mb-3 flex items-center gap-2">
+                <Wand2 className="h-5 w-5 text-purple-600" />
+                <h3 className="text-base font-semibold text-gray-900">期望优化方向</h3>
+                <span className="text-xs text-gray-400">（选择后点击下方按钮生成优化内容）</span>
+              </div>
+              <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {[
+                  { key: 'consistency', label: '角色一致性优化', desc: '统一角色言行与性格设定' },
+                  { key: 'coherence', label: '对话连贯性优化', desc: '让对话逻辑更自然流畅' },
+                  { key: 'interest', label: '对话趣味性增强', desc: '增加对话张力和吸引力' },
+                  { key: 'emotion', label: '情感表达丰富化', desc: '强化情绪渲染和代入感' },
+                  { key: 'rhythm', label: '节奏感优化', desc: '调整对话节奏避免单调' },
+                  { key: 'imagery', label: '画面感增强', desc: '增强场景画面的生动性' },
+                ].map((dir) => {
+                  const isSelected = selectedDirections.includes(dir.key);
+                  return (
+                    <button
+                      key={dir.key}
+                      onClick={() => {
+                        setSelectedDirections((prev) =>
+                          isSelected
+                            ? prev.filter((d) => d !== dir.key)
+                            : [...prev, dir.key]
+                        );
+                      }}
+                      className={`flex flex-col items-start gap-1 rounded-lg border-2 p-3 text-left transition-all ${
+                        isSelected
+                          ? 'border-purple-500 bg-purple-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        {isSelected ? (
+                          <CheckCircle2 className="h-4 w-4 text-purple-600" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-gray-300" />
+                        )}
+                        <span className="text-xs font-medium text-gray-800">{dir.label}</span>
+                      </div>
+                      <span className="text-[10px] text-gray-500 ml-5">{dir.desc}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Target word count */}
+              <div className="mb-4 flex items-center gap-3">
+                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">优化后字数限制</label>
+                <input
+                  type="number"
+                  value={targetWordCount}
+                  onChange={(e) => setTargetWordCount(e.target.value)}
+                  placeholder="不限"
+                  min={0}
+                  className="w-28 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none"
+                />
+                <span className="text-xs text-gray-400">留空表示不限制字数</span>
+              </div>
+              <button
+                onClick={handleReviewerOptimize}
+                disabled={loading || selectedDirections.length === 0}
+                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-md hover:opacity-90 disabled:opacity-50 transition-opacity"
+              >
+                {loading && action === 'generate' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ArrowRight className="h-4 w-4" />
+                )}
+                生成优化内容
+                {selectedDirections.length > 0 && (
+                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                    已选 {selectedDirections.length} 项
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Optimized content */}
+          {optimizedContent && (
+            <div className="rounded-lg border border-green-200 bg-white p-5 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Wand2 className="h-5 w-5 text-green-600" />
+                  <h3 className="text-base font-semibold text-gray-900">优化结果</h3>
+                </div>
+                <button
+                  onClick={() => navigator.clipboard.writeText(optimizedContent)}
+                  className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500 hover:border-green-300 hover:text-green-600 transition-colors"
+                >
+                  <Copy className="h-3.5 w-3.5" /> 复制结果
+                </button>
+              </div>
+              <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-800">
+                {optimizedContent}
+              </div>
             </div>
           )}
         </div>
+      ) : (
+        <>
+          {/* ── Standard tool UI ── */}
+
+          {/* Parameters + Actions */}
+          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+            {/* Parameters */}
+            <div className="mb-5 space-y-4">
+              {currentTool.params.map((param) => (
+                <div key={param.key}>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    {param.label}
+                  </label>
+                  {param.type === 'textarea' ? (
+                    <textarea
+                      value={paramValues[param.key] || ''}
+                      onChange={(e) => setParamValues({ ...paramValues, [param.key]: e.target.value })}
+                      placeholder={param.placeholder}
+                      rows={3}
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20 resize-y min-h-[60px]"
+                    />
+                  ) : param.type === 'select' ? (
+                    <select
+                      value={paramValues[param.key] || ''}
+                      onChange={(e) => setParamValues({ ...paramValues, [param.key]: e.target.value })}
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none bg-white"
+                    >
+                      {param.options?.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={paramValues[param.key] || ''}
+                      onChange={(e) => setParamValues({ ...paramValues, [param.key]: e.target.value })}
+                      placeholder={param.placeholder}
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => callTool('derive')}
+                disabled={loading || !paramValues['prompt']?.trim()}
+                className="flex items-center gap-2 rounded-lg border-2 border-amber-300 bg-amber-50 px-5 py-2.5 text-sm font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50 transition-colors"
+              >
+                {loading && action === 'derive' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Lightbulb className="h-4 w-4" />
+                )}
+                推导分析
+                <span className="text-[10px] text-amber-500 font-normal">先分析再生成</span>
+              </button>
+
+              <button
+                onClick={() => callTool('generate')}
+                disabled={loading || !paramValues['prompt']?.trim()}
+                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-2.5 text-sm font-medium text-white shadow-md hover:opacity-90 disabled:opacity-50 transition-opacity"
+              >
+                {loading && action === 'generate' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Wand2 className="h-4 w-4" />
+                )}
+                开始生成
+              </button>
+            </div>
+          </div>
+
+          {/* Derivation result (collapsible) */}
+          {derivation && (
+            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 shadow-sm">
+              <button
+                onClick={() => setShowDerivation(!showDerivation)}
+                className="flex w-full items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-amber-600" />
+                  <h3 className="text-sm font-medium text-amber-800">推导分析结果</h3>
+                </div>
+                <ChevronDown
+                  className={`h-4 w-4 text-amber-500 transition-transform ${
+                    showDerivation ? 'rotate-0' : '-rotate-90'
+                  }`}
+                />
+              </button>
+              {showDerivation && (
+                <div className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-amber-900">
+                  {derivation}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Final result */}
+          {result && (
+            <div className="mt-4 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Wand2 className="h-4 w-4 text-blue-600" />
+                  <h3 className="text-sm font-medium text-gray-700">生成结果</h3>
+                </div>
+                <button
+                  onClick={copyResult}
+                  className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500 hover:border-blue-300 hover:text-blue-600 transition-colors"
+                >
+                  <Copy className="h-3.5 w-3.5" /> 复制结果
+                </button>
+              </div>
+              {loading && action === 'generate' && !result ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                    <span className="text-sm text-gray-400">AI 正在生成中…</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-800">
+                  {result}
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

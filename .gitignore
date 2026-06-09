@@ -27,7 +27,12 @@ yarn-error.log*
 pnpm-lock.*
 
 # local env files
+.env
 .env*.local
+
+# database
+prisma/dev.db
+prisma/dev.db-journal
 
 # vercel
 .vercel

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { getUserFromRequest } from '@/lib/auth';
 
+// 阻止构建时静态生成检测
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
@@ -14,6 +14,9 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    // 懒加载 prisma，避免构建时初始化
+    const { prisma } = await import('@/lib/prisma');
 
     // 从数据库获取最新的用户信息
     const user = await prisma.user.findUnique({

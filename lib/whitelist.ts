@@ -1,24 +1,27 @@
 /**
- * 白名单路由配置
- * 定义哪些路由可以在未登录状态下访问
+ * 账号白名单配置
+ * 白名单账号可以绕过常规密码验证直接登录
+ * 如果用户不存在则自动创建，如果密码不匹配则自动更新
  */
-
-// 白名单路由前缀列表
-const WHITELIST_PREFIXES: string[] = [
-  '/api/wordflow',
-];
-
-/**
- * 检查请求路径是否在白名单中
- */
-export function isPathWhitelisted(pathname: string): boolean {
-  return WHITELIST_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+export interface WhitelistAccount {
+  email: string
+  password: string
+  name?: string
 }
 
+export const WHITELIST_ACCOUNTS: WhitelistAccount[] = [
+  {
+    email: '15600705234@163.com',
+    password: '1234qwer',
+    name: 'Admin',
+  },
+]
+
 /**
- * 检查请求是否允许以访客身份访问
- * 当前策略：白名单内的所有请求均允许访客访问
+ * 检查邮箱是否在白名单中
  */
-export function isGuestAllowed(pathname: string, method: string): boolean {
-  return isPathWhitelisted(pathname);
+export function getWhitelistAccount(email: string): WhitelistAccount | undefined {
+  return WHITELIST_ACCOUNTS.find(
+    (a) => a.email.toLowerCase() === email.toLowerCase(),
+  )
 }

@@ -25,3 +25,14 @@ export function getWhitelistAccount(email: string): WhitelistAccount | undefined
     (a) => a.email.toLowerCase() === email.toLowerCase(),
   )
 }
+
+const GUEST_READ_PATHS = [
+  /^\/api\/wordflow\/books/,
+  /^\/api\/wordflow\/books\/[^/]+\/chapters/,
+  /^\/api\/wordflow\/books\/[^/]+\/sync/,
+];
+
+export function isGuestAllowed(pathname: string, method: string): boolean {
+  if (method !== 'GET') return false;
+  return GUEST_READ_PATHS.some((pattern) => pattern.test(pathname));
+}

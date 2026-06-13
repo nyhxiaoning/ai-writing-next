@@ -184,7 +184,7 @@ export default function ChapterEditor({ content, onChange, placeholder, limit }:
       Highlight,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Underline,
-    ],
+    ] as any[],
     content,
     onUpdate: ({ editor }) => {
       isEditorUpdate.current = true;
@@ -276,35 +276,35 @@ export default function ChapterEditor({ content, onChange, placeholder, limit }:
         {/* Formatting buttons — only show in edit mode */}
         {viewMode === 'edit' && (
           <>
-            <ToolbarButton onClick={() => editor!.chain().focus().toggleBold().run()} active={editor!.isActive('bold')} title="粗体 (Ctrl+B)">
+            <ToolbarButton onClick={() => (editor!.chain().focus() as any).toggleBold().run()} active={editor!.isActive('bold')} title="粗体 (Ctrl+B)">
               <Bold className="h-4 w-4" />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor!.chain().focus().toggleItalic().run()} active={editor!.isActive('italic')} title="斜体 (Ctrl+I)">
+            <ToolbarButton onClick={() => (editor!.chain().focus() as any).toggleItalic().run()} active={editor!.isActive('italic')} title="斜体 (Ctrl+I)">
               <Italic className="h-4 w-4" />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor!.chain().focus().toggleUnderline().run()} active={editor!.isActive('underline')} title="下划线 (Ctrl+U)">
+            <ToolbarButton onClick={() => (editor!.chain().focus() as any).toggleUnderline().run()} active={editor!.isActive('underline')} title="下划线 (Ctrl+U)">
               <UnderlineIcon className="h-4 w-4" />
             </ToolbarButton>
             <span className="mx-1 h-5 w-px bg-gray-200" />
 
-            <ToolbarButton onClick={() => editor!.chain().focus().toggleHeading({ level: 1 }).run()} active={editor!.isActive('heading', { level: 1 })} title="标题 1">
+            <ToolbarButton onClick={() => (editor!.chain().focus() as any).toggleHeading({ level: 1 }).run()} active={editor!.isActive('heading', { level: 1 })} title="标题 1">
               <Heading1 className="h-4 w-4" />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor!.chain().focus().toggleHeading({ level: 2 }).run()} active={editor!.isActive('heading', { level: 2 })} title="标题 2">
+            <ToolbarButton onClick={() => (editor!.chain().focus() as any).toggleHeading({ level: 2 }).run()} active={editor!.isActive('heading', { level: 2 })} title="标题 2">
               <Heading2 className="h-4 w-4" />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor!.chain().focus().toggleHeading({ level: 3 }).run()} active={editor!.isActive('heading', { level: 3 })} title="标题 3">
+            <ToolbarButton onClick={() => (editor!.chain().focus() as any).toggleHeading({ level: 3 }).run()} active={editor!.isActive('heading', { level: 3 })} title="标题 3">
               <Heading3 className="h-4 w-4" />
             </ToolbarButton>
             <span className="mx-1 h-5 w-px bg-gray-200" />
 
-            <ToolbarButton onClick={() => editor!.chain().focus().toggleBulletList().run()} active={editor!.isActive('bulletList')} title="无序列表">
+            <ToolbarButton onClick={() => (editor!.chain().focus() as any).toggleBulletList().run()} active={editor!.isActive('bulletList')} title="无序列表">
               <List className="h-4 w-4" />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor!.chain().focus().toggleOrderedList().run()} active={editor!.isActive('orderedList')} title="有序列表">
+            <ToolbarButton onClick={() => (editor!.chain().focus() as any).toggleOrderedList().run()} active={editor!.isActive('orderedList')} title="有序列表">
               <ListOrdered className="h-4 w-4" />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor!.chain().focus().toggleBlockquote().run()} active={editor!.isActive('blockquote')} title="引用">
+            <ToolbarButton onClick={() => (editor!.chain().focus() as any).toggleBlockquote().run()} active={editor!.isActive('blockquote')} title="引用">
               <Quote className="h-4 w-4" />
             </ToolbarButton>
             <span className="mx-1 h-5 w-px bg-gray-200" />

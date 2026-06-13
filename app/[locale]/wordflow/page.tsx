@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Book, Plus, BookOpen, FileText, TrendingUp, Upload, Download, Loader2, Settings } from 'lucide-react';
+import { Book, Plus, BookOpen, FileText, TrendingUp, Upload, Download, Loader2, Settings, Github, X, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import GitHubSyncModal from '@/components/wordflow/GitHubSyncModal';
+import GitHubSyncPanel from '@/components/wordflow/GitHubSyncPanel';
+import GlobalSyncPanel from '@/components/wordflow/GlobalSyncPanel';
 
 interface BookData {
   id: string;
@@ -41,6 +43,8 @@ export default function WordFlowDashboard() {
   const [syncingBooks, setSyncingBooks] = useState<Record<string, 'push' | 'pull' | null>>({});
   const [syncMessages, setSyncMessages] = useState<Record<string, string>>({});
   const [syncModalBookId, setSyncModalBookId] = useState<string | null>(null);
+  const [syncPanelBookId, setSyncPanelBookId] = useState<string | null>(null);
+  const [showGlobalSync, setShowGlobalSync] = useState(false);
   const [totalWords, setTotalWords] = useState(0);
 
   useEffect(() => {
@@ -237,7 +241,9 @@ export default function WordFlowDashboard() {
   }
 
   return (
-    <div>
+    <div className="flex gap-4">
+      {/* Main Content */}
+      <div className="flex-1 min-w-0">
       {/* Stats */}
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border bg-white p-4 shadow-sm">
@@ -318,6 +324,14 @@ export default function WordFlowDashboard() {
                 <Upload className="h-4 w-4" />
               )}
               同步推送
+            </button>
+            <button
+              onClick={() => setShowGlobalSync(true)}
+              className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              title="管理所有作品的远程同步配置"
+            >
+              <Settings className="h-4 w-4" />
+              同步设置
             </button>
           </div>
           <div className="w-px h-6 bg-gray-200" />
@@ -404,11 +418,15 @@ export default function WordFlowDashboard() {
                     推送
                   </button>
                   <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSyncModalBookId(book.id); }}
-                    className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSyncPanelBookId(syncPanelBookId === book.id ? null : book.id); }}
+                    className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+                      syncPanelBookId === book.id 
+                        ? 'bg-blue-100 text-blue-600' 
+                        : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+                    }`}
                     title="配置 GitHub 同步"
                   >
-                    <Settings className="h-3 w-3" />
+                    <Github className="h-3 w-3" />
                   </button>
                   <span className="text-gray-400">{bt('lastEdited')}: {new Date(book.updatedAt).toLocaleDateString()}</span>
                 </div>
@@ -524,6 +542,31 @@ export default function WordFlowDashboard() {
         config={syncModalBookId ? (syncConfigs[syncModalBookId] || null) as SyncConfig | null : null}
         onClose={() => setSyncModalBookId(null)}
         onSaved={() => { setSyncModalBookId(null); fetchSyncConfigs(books); }}
+      />
+      </div>
+
+      {/* Right: GitHub Sync Panel */}
+      {syncPanelBookId && (
+        <div className="w-80 shrink-0 rounded-lg border border-gray-200 bg-white overflow-hidden">
+          <GitHubSyncPanel
+            bookId={syncPanelBookId}
+            config={syncConfigs[syncPanelBookId] || null}
+            onSaved={() => fetchSyncConfigs(books)}
+          />
+        </div>
+      )}
+
+      {/* Global Sync Settings Panel */}
+      <GlobalSyncPanel
+        open={showGlobalSync}
+        books={books}
+        syncConfigs={syncConfigs}
+        onClose={() => setShowGlobalSync(false)}
+        onSyncAll={async (direction) => {
+          if (direction === 'push') await handleBatchPush();
+          else await handleBatchPull();
+        }}
+        onConfigsRefreshed={() => fetchSyncConfigs(books)}
       />
     </div>
   );

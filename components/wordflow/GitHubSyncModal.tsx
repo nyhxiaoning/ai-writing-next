@@ -42,14 +42,14 @@ export default function GitHubSyncModal({
         setForm({
           owner: config.githubOwner || '',
           repo: config.githubRepo || '',
-          path: config.githubPath || `data/book-${bookId}.json`,
+          path: config.githubPath || 'story/data.json',
           token: '',
         });
       } else {
         setForm({
           owner: '',
           repo: '',
-          path: `data/book-${bookId}.json`,
+          path: 'story/data.json',
           token: '',
         });
       }
@@ -87,7 +87,7 @@ export default function GitHubSyncModal({
         method: 'DELETE',
       });
       if (res.ok) {
-        setForm({ owner: '', repo: '', path: `data/book-${bookId}.json`, token: '' });
+        setForm({ owner: '', repo: '', path: 'story/data.json', token: '' });
         onSaved();
         onClose();
       }

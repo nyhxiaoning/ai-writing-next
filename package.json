@@ -7,7 +7,11 @@
     "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "npx prisma generate"
+    "postinstall": "npx prisma generate",
+    "db:sqlite": "cp prisma/schema.prisma prisma/schema.prisma.bak && npx prisma generate && npx prisma db push",
+    "db:postgres": "cp prisma/schema.postgresql.prisma prisma/schema.prisma && npx prisma generate && npx prisma db push",
+    "db:reset": "rm -f prisma/dev.db && npx prisma db push",
+    "db:studio": "npx prisma studio"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -69,5 +73,6 @@
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
-  }
+  },
+  "packageManager": "pnpm@8.6.3+sha1.30b2ad9776a393ccd1766239fd21e0c14a3c3acf"
 }

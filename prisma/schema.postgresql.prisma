@@ -1,9 +1,12 @@
+// This is the PostgreSQL schema for production deployments
+// Copy this to schema.prisma and run `prisma generate` when deploying to PostgreSQL
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
